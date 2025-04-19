@@ -13,6 +13,8 @@ def title():
 def index():
     form = MainWindow()
     if form.validate_on_submit():
+        if form.submit_login.data:
+            return redirect('/authorization')
         return redirect('/login')
     return render_template('index.html', title='Главная страница', form=form)
 
