@@ -1,3 +1,9 @@
+{% extends "base.html" %}
+
 {% block content %}
-    <h1>Наш проект - Портфолио!</h1>
+    <form action="" method="post" novalidate>
+         {{ form.hidden_tag() }}
+         <p>{{ form.submit_login(type="submit", class="btn btn-primary") }}</p>
+         <p>{{ form.submit_registration(type="submit", class="btn btn-primary") }}</p>
+    </form>
 {% endblock %}

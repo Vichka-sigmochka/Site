@@ -1,27 +1,20 @@
 from flask import Flask, render_template, redirect
 from loginform import LoginForm, RegisterForm
+from mainwindow import MainWindow
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 @app.route('/')
-@app.route('/index')
-def index():
-    return render_template('index.html', title='Домашняя страница')
+def title():
+    return render_template('base.html',  title='Главная')
 
-# @app.route('/<word>')
-# @app.route('/index/<word>')
-# def index1(word):
-#     return render_template('base.html', title=word)
-#
-#
-# #@app.route('/training/<prof>')
-# #def training(prof):
-#     #return render_template('training.html', prof=prof)
-#
-# @app.route('/list_prof/<list>')
-# def list_prof(list):
-#     return render_template('list_prof.html', param=list)
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    form = MainWindow()
+    if form.validate_on_submit():
+        return redirect('/login')
+    return render_template('index.html', title='Главная страница', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
