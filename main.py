@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from forms.loginform import RegisterForm, LoginForm
 from data import db_session
 from data.users import User
@@ -43,19 +42,13 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            surname=form.surname.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        return redirect('/index')
     return render_template('register.html', title='Регистрация', form=form)
-
-def set_password(self, password):
-    self.hashed_password = generate_password_hash(password)
-
-def check_password(self, password):
-    return check_password_hash(self.hashed_password, password)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -87,7 +80,7 @@ def logout():
     return redirect("/")
 
 def main():
-    db_session.global_init("db/user.db")
+    db_session.global_init("db/user1.db")
     app.run()
 
 if __name__ == '__main__':
