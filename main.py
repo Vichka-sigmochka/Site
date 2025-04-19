@@ -29,8 +29,12 @@ def login():
 def authorization():
     form = LoginForm()
     if form.validate_on_submit():
-        return redirect('/')
+        return redirect('/home')
     return render_template('authorization.html', title='Авторизация', form=form)
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html', title='Домашняя страница')
 
 
 if __name__ == '__main__':
