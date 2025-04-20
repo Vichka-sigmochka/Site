@@ -1,10 +1,10 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, flash
 from mainwindow import MainWindow
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm
-from forms.post import Post
+from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User
+from data.users import User, Post
 import datetime
 import os
 from PIL import Image
@@ -22,9 +22,13 @@ login_manager.init_app(app)
 
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-#db = SQLAlchemy(app)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(int(user_id))
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -90,7 +94,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('about'))
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -98,8 +102,9 @@ def home():
 
 @app.route('/about')
 def about():
-    posts = Post.query.order_by(Post.id.desc()).all()
-    return render_template('index.html', posts=posts)
+    db_sess = db_session.create_session()
+    posts = db_sess.query(Post).order_by(Post.id.desc()).all()
+    return render_template('about.html', posts=posts)
 
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
@@ -117,41 +122,44 @@ def create():
             image.save(image_path)
             resize_image(image_path)
             new_post.image = filename
-
-        db.session.add(new_post)
-        db.session.commit()
+        db_sess = db_session.create_session()
+        db_sess.add(new_post)
+        db_sess.commit()
+        #db.session.add(new_post)
+        #db.session.commit()
 
         flash('Пост успешно создан!')
-        return redirect(url_for('index'))
+        return redirect(url_for('about'))
 
     return render_template('post.html')
 
 @app.route('/delete/<int:post_id>')
 @login_required
 def delete(post_id):
-    post = Post.query.get_or_404(post_id)
+    db_sess = db_session.create_session()
+    post = db_sess.query(Post).get_or_404(post_id)
 
     if post.author != current_user:
         flash('Вы не можете удалить этот пост')
-        return redirect(url_for('index'))
+        return redirect(url_for('about'))
 
     if post.image:
         try:
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
         except:
             pass
-
-    db.session.delete(post)
-    db.session.commit()
+    db_sess = db_session.create_session()
+    db_sess.delete(post)
+    db_sess.commit()
+    #db.session.delete(post)
+    #db.session.commit()
 
     flash('Пост успешно удален')
-    return redirect(url_for('index'))
+    return redirect(url_for('about'))
 
 def main():
-    with app.app_context():
-        db.create_all()
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/user1.db")
+    db_session.global_init("db/postusers.db")
     app.run()
 
 if __name__ == '__main__':
