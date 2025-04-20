@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Загрузка изображений</title>
+</head>
+<body>
+    <h1>Загрузить изображение</h1>
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button type="submit">Загрузить</button>
+    </form>
+
+    <h2>Загруженные изображения:</h2>
+    <div>
+        {% for file in files %}
+            <img src="{{ url_for('static', filename='uploads/' + file) }}" width="200" style="margin: 10px;">
+        {% endfor %}
+    </div>
+</body>
+</html>

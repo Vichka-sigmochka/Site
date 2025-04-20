@@ -1,17 +1,29 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, url_for
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user
 from forms.loginform import RegisterForm, LoginForm
 from data import db_session
 from data.users import User
 import datetime
+import os
 
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def title():
@@ -72,6 +84,25 @@ def load_user(user_id):
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     return render_template('home.html', title='Домашняя страница')
+
+@app.route('/about')
+def about():
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template('about.html', files=files)
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('about'))
+    return redirect(request.url)
+
 
 @app.route('/logout')
 @login_required
