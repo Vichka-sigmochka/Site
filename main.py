@@ -2,28 +2,38 @@ from flask import Flask, render_template, redirect, request, url_for
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user
 from forms.loginform import RegisterForm, LoginForm
+from forms.post import Post
 from data import db_session
 from data.users import User
 import datetime
 import os
+from PIL import Image
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+#db = SQLAlchemy(app)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
 
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def resize_image(image_path, max_size=(800, 800)):
+    img = Image.open(image_path)
+    img.thumbnail(max_size)
+    img.save(image_path)
 
 @app.route('/')
 def title():
@@ -76,10 +86,11 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
-@login_manager.user_loader
-def load_user(user_id):
-    db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -87,30 +98,59 @@ def home():
 
 @app.route('/about')
 def about():
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template('about.html', files=files)
+    posts = Post.query.order_by(Post.id.desc()).all()
+    return render_template('index.html', posts=posts)
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        filename = file.filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return redirect(url_for('about'))
-    return redirect(request.url)
-
-
-@app.route('/logout')
+@app.route('/create', methods=['GET', 'POST'])
 @login_required
-def logout():
-    logout_user()
-    return redirect("/")
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image = request.files['image']
+
+        new_post = Post(title=title, content=content, author=current_user)
+
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(image_path)
+            resize_image(image_path)
+            new_post.image = filename
+
+        db.session.add(new_post)
+        db.session.commit()
+
+        flash('Пост успешно создан!')
+        return redirect(url_for('index'))
+
+    return render_template('post.html')
+
+@app.route('/delete/<int:post_id>')
+@login_required
+def delete(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    if post.author != current_user:
+        flash('Вы не можете удалить этот пост')
+        return redirect(url_for('index'))
+
+    if post.image:
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
+        except:
+            pass
+
+    db.session.delete(post)
+    db.session.commit()
+
+    flash('Пост успешно удален')
+    return redirect(url_for('index'))
 
 def main():
+    with app.app_context():
+        db.create_all()
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db_session.global_init("db/user1.db")
     app.run()
 

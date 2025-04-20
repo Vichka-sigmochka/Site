@@ -1,20 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Загрузка изображений</title>
-</head>
-<body>
-    <h1>Загрузить изображение</h1>
-    <form method="post" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*">
-        <button type="submit">Загрузить</button>
-    </form>
+{% extends "base.html" %}
 
-    <h2>Загруженные изображения:</h2>
-    <div>
-        {% for file in files %}
-            <img src="{{ url_for('static', filename='uploads/' + file) }}" width="200" style="margin: 10px;">
-        {% endfor %}
-    </div>
-</body>
-</html>
+{% block content %}
+    <h1>Мой блог</h1>
+
+    {% for post in posts %}
+        <div class="post">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content }}</p>
+            {% if post.image %}
+                <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}">
+            {% endif %}
+            <p><small>Автор: {{ post.author.username }}</small></p>
+
+            {% if current_user == post.author %}
+                <a href="{{ url_for('delete', post_id=post.id) }}" onclick="return confirm('Удалить этот пост?')">Удалить</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}
