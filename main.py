@@ -13,10 +13,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-@app.route('/')
-def title():
-    return render_template('base.html',  title='Главная')
 
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = MainWindow()
@@ -71,13 +69,15 @@ def load_user(user_id):
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    print(login_manager)
     return render_template('home.html', title='Домашняя страница')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect("/")
+    print(type(login_manager))
+    return redirect("/index")
 
 def main():
     db_session.global_init("db/user1.db")

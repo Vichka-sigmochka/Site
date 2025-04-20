@@ -1,9 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form action="" method="post" novalidate>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шапка сайта</title>
+    <style>
+        /* Стили для шапки */
+        .header {
+            background-color: #f0f0f0; /* Светло-серый фон */
+            padding: 10px 0; /* Отступы сверху и снизу */
+            text-align: center; /* Выравнивание ссылок по центру */
+            font-family: sans-serif; /* Шрифт */
+        }
+
+        .header a {
+            display: inline-block; /* Расположение ссылок в одну строку */
+            margin: 0 15px; /* Отступы между ссылками */
+            text-decoration: none; /* Убрать подчеркивание */
+            color: #333; /* Темно-серый цвет текста */
+            font-weight: bold; /* Жирный шрифт */
+        }
+
+        .header a:hover {
+            color: #007bff; /* Цвет текста при наведении */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <form action="" method="post" novalidate>
          {{ form.hidden_tag() }}
-         <p>{{ form.submit_login(type="submit", class="btn btn-primary") }}</p>
-         <p>{{ form.submit_registration(type="submit", class="btn btn-primary") }}</p>
-    </form>
+         <a href="/people">Люди  {{ form.submit_login(type="submit", class="btn btn-primary") }} {{ form.submit_registration(type="submit", class="btn btn-primary") }} </a>
+        </form>
+    </header>
+
+    <main>
+        <h1>Содержимое сайта</h1>
+        <p>Здесь будет располагаться основной контент вашего сайта.</p>
+    </main>
+
+</body>
+</html>
+
 {% endblock %}
