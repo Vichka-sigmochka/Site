@@ -69,14 +69,12 @@ def load_user(user_id):
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    print(login_manager)
     return render_template('home.html', title='Домашняя страница')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    print(type(login_manager))
     return redirect("/index")
 
 def main():
