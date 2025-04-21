@@ -53,7 +53,7 @@ def index():
     return render_template('index.html', title='Главная страница', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -94,7 +94,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('about'))
+    return redirect(url_for('index'))
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -110,26 +110,33 @@ def about():
 @login_required
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        image = request.files['image']
-
-        new_post = Post(title=title, content=content, author=current_user)
-
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image.save(image_path)
-            resize_image(image_path)
-            new_post.image = filename
         db_sess = db_session.create_session()
-        db_sess.add(new_post)
-        db_sess.commit()
-        #db.session.add(new_post)
-        #db.session.commit()
+        try:
+            title = request.form['title']
+            content = request.form['content']
+            image = request.files['image']
+            new_post = Post(
+                title=title,
+                content=content,
+                user_id=current_user.id
+            )
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                image.save(image_path)
+                resize_image(image_path)
+                new_post.image = filename
 
-        flash('Пост успешно создан!')
-        return redirect(url_for('about'))
+            db_sess.add(new_post)
+            db_sess.commit()
+
+            flash('Пост успешно создан!')
+            return redirect(url_for('about'))
+
+        except Exception as e:
+            db_sess.rollback()
+            flash(f'Ошибка при создании поста: {str(e)}')
+            app.logger.error(f'Error creating post: {str(e)}')
 
     return render_template('post.html')
 
@@ -137,24 +144,28 @@ def create():
 @login_required
 def delete(post_id):
     db_sess = db_session.create_session()
-    post = db_sess.query(Post).get_or_404(post_id)
+    post = db_sess.query(Post).get(post_id)
+    if not post:
+        os.abort(404)
 
     if post.author != current_user:
         flash('Вы не можете удалить этот пост')
         return redirect(url_for('about'))
 
-    if post.image:
-        try:
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
-        except:
-            pass
-    db_sess = db_session.create_session()
-    db_sess.delete(post)
-    db_sess.commit()
-    #db.session.delete(post)
-    #db.session.commit()
+    try:
+        if post.image:
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
+            except:
+                pass
 
-    flash('Пост успешно удален')
+        db_sess.delete(post)
+        db_sess.commit()
+        flash('Пост успешно удален')
+    except:
+        db_sess.rollback()
+        flash('Ошибка при удалении поста')
+
     return redirect(url_for('about'))
 
 def main():
