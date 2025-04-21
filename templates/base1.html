@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой блог</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .post { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+        .post img { max-width: 100%; height: auto; }
+        .flash { padding: 10px; background: #f0f0f0; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('create') }}">Создать пост</a> |
+            <a href="{{ url_for('logout') }}">Выйти</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Войти</a> |
+            <a href="{{ url_for('register') }}">Регистрация</a>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash">
+                {% for message in messages %}
+                    {{ message }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>
