@@ -39,10 +39,8 @@ def resize_image(image_path, max_size=(800, 800)):
     img.thumbnail(max_size)
     img.save(image_path)
 
-@app.route('/')
-def title():
-    return render_template('base.html',  title='Главная')
 
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = MainWindow()
@@ -95,6 +93,12 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/lk')
+@login_required
+def dashboard():
+    return render_template('lk.html', username=current_user.name)
+
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
