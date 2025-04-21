@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect
 from mainwindow import MainWindow
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm
 from data import db_session
 from data.users import User
@@ -62,14 +62,19 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html', title='Домашняя страница')
+
+@app.route('/lk')
+@login_required
+def dashboard():
+    return render_template('lk.html', username=current_user.name)
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
-
-@app.route('/home', methods=['GET', 'POST'])
-def home():
-    return render_template('home.html', title='Домашняя страница')
 
 @app.route('/logout')
 @login_required
