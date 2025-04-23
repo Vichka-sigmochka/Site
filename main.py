@@ -176,6 +176,14 @@ def delete(post_id):
 def projects():
     return "Мои проекты"
 
+@app.route('/friends')
+def friends():
+    return "friends"
+
+@app.route('/find')
+def find():
+    return "find"
+
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
