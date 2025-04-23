@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-
-{% block content %}
-<html lang="ru">
+<!doctype html>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,18 +29,18 @@
 <body>
 
     <header class="header">
-        <form action="" method="post" novalidate>
-         {{ form.hidden_tag() }}
-         <a href="/people">Люди {{ form.submit_login(type="submit", class="btn btn-primary") }} {{ form.submit_registration(type="submit", class="btn btn-primary") }} </a>
-        </form>
+        <a href="/about">Обо мне</a>
+        <a href="/lk">ЛК</a>
+        <a href="/projects">Проеты</a>
+        <a href="/life">Моя жизнь</a>
+        <a href="/logout">Выйти</a>
     </header>
-
-    <main>
-        <h1>Содержимое сайта</h1>
-        <p>Здесь будет располагаться основной контент вашего сайта.</p>
-    </main>
-
+</body>
+<head>
+    <title>Личный кабинет</title>
+</head>
+<body>
+<h2>Добро пожаловать, {{ username }}!</h2>
+<a href="{{ url_for('logout') }}">Выйти</a>
 </body>
 </html>
-
-{% endblock %}
