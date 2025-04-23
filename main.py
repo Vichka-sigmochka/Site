@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm
@@ -180,9 +180,25 @@ def projects():
 def friends():
     return "friends"
 
+data = [
+    "hello",
+    "hi",
+    "cat",
+    "cook",
+    "help"
+]
+
 @app.route('/find')
 def find():
-    return "find"
+    return render_template('search.html')
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('q', '').lower()
+    if not query:
+        return jsonify([])
+    ans = [s for s in data if s.lower().startswith(query)]
+    return jsonify(ans[:5])
 
 
 def main():
