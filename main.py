@@ -168,6 +168,11 @@ def delete(post_id):
 
     return redirect(url_for('about'))
 
+@app.route('/projects')
+def projects():
+    return "Мои проекты"
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db_session.global_init("db/postusers.db")
