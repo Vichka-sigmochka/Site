@@ -1,0 +1,30 @@
+{% extends "base_for_project.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        {% if project.image %}
+            <img src="{{ url_for('static', filename='uploads/' + project.image) }}" class="card-img-top" alt="{{ project.title }}">
+        {% endif %}
+        <div class="card-body">
+            <h1 class="card-title">{{ project.title }}</h1>
+            <p class="card-text">{{ project.description }}</p>
+
+            {% if current_user.is_authenticated and current_user == project.author %}
+                <div class="btn-group mt-3">
+                    <a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn btn-warning">Редактировать</a>
+                    <form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" class="ms-2">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот проект?')">Удалить</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            Опубликовано: {{ project.date_created.strftime('%d.%m.%Y в %H:%M') }}
+            {% if project.author %}
+                | Автор: {{ project.author.id }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

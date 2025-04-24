@@ -1,0 +1,35 @@
+{% extends "base_for_project.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Мои проекты</h1>
+
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('add_project') }}" class="btn btn-primary mb-4">Добавить проект</a>
+    {% endif %}
+
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if project.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + project.image) }}" class="card-img-top" alt="{{ project.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ project.title }}</h5>
+                    <p class="card-text">{{ project.description[:100] }}{% if project.description|length > 100 %}...{% endif %}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                    <small class="text-muted float-end">{{ project.date_created.strftime('%d.%m.%Y') }}</small>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">Пока нет ни одного проекта.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

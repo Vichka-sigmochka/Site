@@ -5,12 +5,14 @@
 
     {% for post in posts %}
         <div class="post">
-            <h2>{{ post.title }}</h2>
-            <p>{{ post.content }}</p>
-            {% if post.image %}
-                <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}">
+            {%if current_user == post.author%}
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}">
+                {% endif %}
+                <p><small>Автор: {{ post.author.id }}</small></p>
             {% endif %}
-            <p><small>Автор: {{ post.author.username }}</small></p>
 
             {% if current_user == post.author %}
                 <a href="{{ url_for('delete', post_id=post.id) }}" onclick="return confirm('Удалить этот пост?')">Удалить</a>
