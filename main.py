@@ -8,6 +8,7 @@ from data.users import User, Post
 import datetime
 import os
 from PIL import Image
+import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
 
@@ -180,25 +181,27 @@ def projects():
 def friends():
     return "friends"
 
-data = [
-    "hello",
-    "hi",
-    "cat",
-    "cook",
-    "help"
-]
-
 @app.route('/find')
 def find():
     return render_template('search.html')
 
 @app.route('/search', methods=['GET'])
 def search():
-    query = request.args.get('q', '').lower()
-    if not query:
-        return jsonify([])
-    ans = [s for s in data if s.lower().startswith(query)]
-    return jsonify(ans[:5])
+    db_sess = db_session.create_session()
+    data = []
+    try:
+        i = 1
+        while True:
+            user = db_sess.query(User).get(i)
+            data.append((user.name, user.surname))
+            i += 1
+    except:
+        print(data)
+        query = request.args.get('q', '').lower()
+        if not query:
+            return jsonify([])
+        ans = [f'{s[0]} {s[1]}' for s in data if s[0].lower().startswith(query)]
+        return jsonify(ans[:5])
 
 
 def main():
