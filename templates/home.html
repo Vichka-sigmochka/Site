@@ -6,7 +6,6 @@
         <a href="/lk">ЛК</a>
         <a href="/about">Моя жизнь</a>
         <a href="/projects">Проеты</a>
-        <a href="/life">Моя жизнь</a>
         <a href="/logout">Выйти</a>
         <a href="/friends">Друзья</a>
         <a href="/find">Найти</a>
@@ -40,11 +39,10 @@
                              style="max-width: 100%; height: auto; margin-bottom: 15px;">
                     {% endif %}
 
-                    {# Информация об авторе #}
-                    {% if post.author and post.author.username %}
-                        <p style="font-size: 0.9em; color: #666;">
-                            Автор: {{ post.author.username }}
-                        </p>
+                    {% if post.author %}
+                        <a style="font-size: 0.9em; color: #666;">
+                            Автор: {{ post.author.id }}
+                        </a>
                     {% endif %}
 
                     {# Кнопка удаления для автора #}

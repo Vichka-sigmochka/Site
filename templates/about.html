@@ -11,7 +11,7 @@
                 {% if post.image %}
                     <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}">
                 {% endif %}
-                <p><small>Автор: {{ post.username }}</small></p>
+                <p><small>Автор: {{ post.author.id }}</small></p>
             {% endif %}
 
             {% if current_user == post.author %}
