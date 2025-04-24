@@ -103,7 +103,20 @@ def dashboard():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html', title='Домашняя страница')
+    db_sess = db_session.create_session()
+    posts = db_sess.query(Post).order_by(Post.user_id.desc()).all()
+    posts_data = []
+    for post in posts:
+        posts_data.append({
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'image': post.image,
+        })
+    return render_template('home.html',
+                           posts=posts_data,
+                           current_user=current_user,
+                           title='Домашняя страница')
 
 @app.route('/about')
 def about():
