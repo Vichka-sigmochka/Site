@@ -8,7 +8,7 @@ from data.users import User, Post
 import datetime
 import os
 from PIL import Image
-import sqlite3
+#import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
 
