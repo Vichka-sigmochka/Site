@@ -1,13 +1,13 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.loginform import RegisterForm, LoginForm
 from werkzeug.utils import secure_filename
 from data import db_session
 from data.users import User, Post, Project
 import datetime
 import os
 from PIL import Image
+from forms.loginform import LoginForm, RegisterForm, ProfileForm
 #import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
@@ -93,11 +93,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
-@app.route('/lk')
-@login_required
-def dashboard():
-    return render_template('lk.html', username=current_user.name)
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -319,6 +314,42 @@ def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db_session.global_init("db/postusers.db")
     app.run()
+
+''''@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = ProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+
+        # Обработка загрузки файла
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename != '' and allowed_file(file.filename):
+                # Удаляем старый аватар если он есть
+                if current_user.avatar:
+                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+
+                # Генерируем уникальное имя файла
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = secure_filename(file.filename)
+                unique_filename = f"{timestamp}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                current_user.avatar = unique_filename
+
+        db.session.commit()
+        flash('Профиль успешно обновлен!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('profile/edit.html', form=form)
+
+
+@app.route('/profile/<int:user_id>')
+def view_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template('profile/view.html', user=user)'''
 
 if __name__ == '__main__':
     main()
