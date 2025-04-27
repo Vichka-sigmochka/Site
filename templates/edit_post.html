@@ -1,0 +1,33 @@
+{% extends "base_for_post.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">Редактировать пост</h1>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Название поста</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" required>{{ post.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Изображение (необязательно)</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    {% if post.image %}
+                        <div class="mt-2">
+                            <small>Текущее изображение:</small>
+                            <img src="{{ url_for('static', filename='uploads/' + post.image) }}" class="img-thumbnail mt-2" width="150">
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <a href="{{ url_for('post_detail', post_id=post.id) }}" class="btn btn-secondary ms-2">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

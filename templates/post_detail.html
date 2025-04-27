@@ -1,0 +1,30 @@
+{% extends "base_for_post.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        {% if post.image %}
+            <img src="{{ url_for('static', filename='uploads/' + post.image) }}" class="card-img-top" alt="{{ post.title }}">
+        {% endif %}
+        <div class="card-body">
+            <h1 class="card-title">{{ post.title }}</h1>
+            <p class="card-text">{{ post.description }}</p>
+
+            {% if current_user.is_authenticated and current_user == post.author %}
+                <div class="btn-group mt-3">
+                    <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-warning">Редактировать</a>
+                    <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" class="ms-2">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот пост?')">Удалить</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            Опубликовано: {{ post.date_created.strftime('%d.%m.%Y в %H:%M') }}
+            {% if post.author %}
+                | Автор: {{ post.author.id }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
