@@ -1,13 +1,13 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms.loginform import RegisterForm, LoginForm
 from werkzeug.utils import secure_filename
 from data import db_session
 from data.users import User, Post, Project
 import datetime
 import os
 from PIL import Image
-from forms.loginform import LoginForm, RegisterForm, ProfileForm
 #import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
@@ -94,6 +94,11 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.route('/lk')
+@login_required
+def dashboard():
+    return render_template('lk.html', username=current_user.name)
+
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     db_sess = db_session.create_session()
@@ -103,7 +108,7 @@ def home():
         posts_data.append({
             'id': post.id,
             'title': post.title,
-            'content': post.content,
+            'description': post.description,
             'image': post.image,
         })
     return render_template('home.html',
@@ -111,65 +116,118 @@ def home():
                            current_user=current_user,
                            title='Домашняя страница')
 
-@app.route('/about')
-def about():
+@app.route('/posts')
+def posts():
     db_sess = db_session.create_session()
-    posts = db_sess.query(Post).order_by(Post.id.desc()).all()
-    return render_template('about.html', posts=posts)
+    all_posts = db_sess.query(Post).order_by(Post.date_created.desc()).all()
+    return render_template('posts.html', posts=all_posts)
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/add_post', methods=['GET', 'POST'])
 @login_required
-def create():
+def add_post():
     if request.method == 'POST':
         db_sess = db_session.create_session()
         try:
-            title = request.form['title']
-            content = request.form['content']
-            image = request.files['image']
+            if not request.form.get('title') or not request.form.get('description'):
+                flash('Заполните все обязательные поля', 'danger')
+                return redirect(url_for('add_post'))
+            user = db_sess.query(User).get(current_user.id)
             new_post = Post(
-                title=title,
-                content=content,
-                user_id=current_user.id
+                title=request.form['title'],
+                description=request.form['description'],
+                author=user
             )
-            if image and allowed_file(image.filename):
-                filename = secure_filename(image.filename)
-                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                image.save(image_path)
-                resize_image(image_path)
-                new_post.image = filename
+            if 'image' in request.files:
+                image = request.files['image']
+                if image and image.filename != '' and allowed_file(image.filename):
+                    filename = secure_filename(
+                        f"post_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{image.filename.split('.')[-1]}")
+                    try:
+                        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        new_post.image = filename
+                    except Exception as e:
+                        flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
             db_sess.add(new_post)
             db_sess.commit()
-            flash('Пост успешно создан!')
-            return redirect(url_for('about'))
+            flash('Пост успешно добавлен!', 'success')
+            return redirect(url_for('posts'))
         except Exception as e:
             db_sess.rollback()
-            flash(f'Ошибка при создании поста: {str(e)}')
-            app.logger.error(f'Error creating post: {str(e)}')
-    return render_template('post.html')
+            flash(f'Ошибка при сохранении поста: {str(e)}', 'danger')
+            return redirect(url_for('add_post'))
+    return render_template('add_post.html')
 
-@app.route('/delete/<int:post_id>')
-@login_required
-def delete(post_id):
+@app.route('/post/<int:post_id>')
+def post_detail(post_id):
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
     if not post:
         os.abort(404)
-    if post.author != current_user:
-        flash('Вы не можете удалить этот пост')
-        return redirect(url_for('about'))
+    return render_template('post_detail.html', post=post)
+
+@app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    db_sess = db_session.create_session()
+    post = db_sess.query(Post).get(post_id)
+    user = db_sess.query(User).get(current_user.id)
+    if not post:
+        flash('Пост не найден', 'danger')
+        return redirect(url_for('posts'))
+    if post.author != user:
+        flash('Вы не можете редактировать этот пост', 'danger')
+        return redirect(url_for('posts'))
+    if request.method == 'POST':
+        try:
+            post.title = request.form['title']
+            post.description = request.form['description']
+            if 'image' in request.files:
+                image = request.files['image']
+                if image and image.filename != '' and allowed_file(image.filename):
+                    if post.image:
+                        try:
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
+                        except Exception as e:
+                            app.logger.error(f"Error deleting old image: {e}")
+                    ext = image.filename.split('.')[-1]
+                    filename = f"post_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                    image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    post.image = filename
+            db_sess.commit()
+            flash('Пост успешно обновлен!', 'success')
+            return redirect(url_for('post_detail', post_id=post.id))
+        except Exception as e:
+            db_sess.rollback()
+            flash(f'Ошибка при обновлении поста: {str(e)}', 'danger')
+            app.logger.error(f"Error editing post: {e}")
+    return render_template('edit_post.html', post=post)
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    db_sess = db_session.create_session()
     try:
+        post = db_sess.query(Post).get(post_id)
+        user = db_sess.query(User).get(current_user.id)
+        if not post:
+            flash('Пост не найден', 'danger')
+            return redirect(url_for('posts'))
+        if post.author != user:
+            flash('Вы не можете удалить этот пост', 'danger')
+            return redirect(url_for('posts'))
         if post.image:
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
-            except:
-                pass
+            except Exception as e:
+                app.logger.error(f"Error deleting post image: {e}")
         db_sess.delete(post)
         db_sess.commit()
-        flash('Пост успешно удален')
-    except:
+        flash('Пост успешно удален!', 'success')
+    except Exception as e:
         db_sess.rollback()
-        flash('Ошибка при удалении поста')
-    return redirect(url_for('about'))
+        flash(f'Ошибка при удалении поста: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting post: {e}")
+    return redirect(url_for('posts'))
 
 @app.route('/friends')
 def friends():
@@ -310,43 +368,9 @@ def delete_project(project_id):
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
 
-@app.route('/profile', methods=['GET', 'POST'])
-@login_required
-def profile():
-    form = ProfileForm(obj=current_user)
-    if form.validate_on_submit():
-        form.populate_obj(current_user)
-        db_sess = db_session.create_session()
-        # Обработка загрузки файла
-        if 'avatar' in request.files:
-            file = request.files['avatar']
-            if file and file.filename != '' and allowed_file(file.filename):
-                # Удаляем старый аватар если он есть
-                if current_user.avatar:
-                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
-                # Генерируем уникальное имя файла
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = secure_filename(file.filename)
-                unique_filename = f"{timestamp}_{filename}"
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-                current_user.avatar = unique_filename
-
-        db_sess.commit()
-        flash('Профиль успешно обновлен!', 'success')
-        return redirect(url_for('profile'))
-
-    return render_template('profile/edit.html', form=form)
-
-@app.route('/profile/<int:user_id>')
-def view_profile(user_id):
-    user = User.query.get_or_404(user_id)
-    return render_template('profile/view.html', user=user)
-
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/4.db")
+    db_session.global_init("db/new_posts.db")
     app.run()
 
 if __name__ == '__main__':
