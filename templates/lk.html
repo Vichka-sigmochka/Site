@@ -30,21 +30,17 @@
 
     <header class="header">
         <a href="/profile">ЛК</a>
-        <a href="/about">Моя жизнь</a>
+        <a href="/posts">Моя жизнь</a>
         <a href="/projects">Проеты</a>
         <a href="/friends">Друзья</a>
         <a href="/find">Найти</a>
         <a href="/logout">Выйти</a>
     </header>
 </body>
-<head>
-    <title>Личный кабинет</title>
-</head>
-
 <body>
     <h1>Профиль пользователя</h1>
-    <p>Имя: {{user.first_name}}</p>
-    <p>Фамилия: {{user.last_name}}</p>
+    <p>Имя: {{user.name}}</p>
+    <p>Фамилия: {{user.surname}}</p>
     <p>Возраст: {{user.age}} лет</p>
     <p>Должность: {{user.position}}</p>
     <p>Описание: {{user.description}}</p>

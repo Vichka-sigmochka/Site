@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.loginform import RegisterForm, LoginForm
+from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
 from data.users import User, Post, Project
@@ -94,10 +94,73 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/lk')
+
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
-def dashboard():
-    return render_template('lk.html', username=current_user.name)
+def profile():
+    db_sess = db_session.create_session()
+    form = ProfileForm()
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+
+        # Обработка загрузки файла
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename != '' and allowed_file(file.filename):
+                # Удаляем старый аватар если он есть
+                if current_user.avatar:
+                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+
+                # Генерируем уникальное имя файла
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = secure_filename(file.filename)
+                unique_filename = f"{timestamp}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                current_user.avatar = unique_filename
+
+        db_sess.commit()
+        flash('Профиль успешно обновлен!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('profile_edit.html', form=form)
+
+
+@app.route('/profile/<int:user_id>')
+def view_profile(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get_or_404(user_id)
+    return render_template('profile_view.html', user=user)
+
+
+'''
+@app.route('/lk', methods=['GET'])
+def lk():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.id)
+    return render_template('lk.html', user=user)
+
+
+@app.route('/edit_lk/<int:user_id>', methods=['GET', 'POST'])
+def edit_profile(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(user_id)
+    if request.method == 'POST':
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+        user.age = request.form['age']
+        user.position = request.form['position']
+        user.description = request.form['description']
+        user.phone_number = request.form['phone_number']
+        user.social_links = request.form['social_links']
+        user.photo = request.form['photo']  # Здесь нужно добавить обработку загрузки файлов
+
+        db_sess.commit()
+        return redirect(url_for('lk', user_id=user.id))
+
+    return render_template('edit_lk.html', user=user)
+'''
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -370,7 +433,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new.db")
+    db_session.global_init("db/new1.db")
     app.run()
 
 if __name__ == '__main__':
