@@ -1,10 +1,10 @@
-{% extends "base1.html" %}
+{% extends "base.html" %}
 
 {% block content %}
     <h1>Мой блог</h1>
     <header class="header">
         <a href="/lk">ЛК</a>
-        <a href="/about">Моя жизнь</a>
+        <a href="/posts">Моя жизнь</a>
         <a href="/projects">Проеты</a>
         <a href="/logout">Выйти</a>
         <a href="/friends">Друзья</a>
@@ -39,15 +39,16 @@
                              style="max-width: 100%; height: auto; margin-bottom: 15px;">
                     {% endif %}
 
+                    {# Информация об авторе #}
                     {% if post.author %}
-                        <a style="font-size: 0.9em; color: #666;">
-                            Автор: {{ post.author.id }}
-                        </a>
+                        <p style="font-size: 0.9em; color: #666;">
+                            Автор: {{ post.author.username if post.author.username else post.author.name }}
+                        </p>
                     {% endif %}
 
                     {# Кнопка удаления для автора #}
                     {% if current_user.is_authenticated and current_user == post.author %}
-                        <a href="{{ url_for('delete', post_id=post.id) }}"
+                        <a href="{{ url_for('post_delete', post_id=post.id) }}"
                            onclick="return confirm('Удалить этот пост?')"
                            style="color: #ff0000; text-decoration: none;">
                             Удалить
@@ -59,7 +60,7 @@
             <div style="padding: 20px; background: #f5f5f5; border-radius: 5px;">
                 <p>Пока нет ни одного поста.</p>
                 {% if current_user.is_authenticated %}
-                    <p><a href="{{ url_for('create_post') }}">Создать первый пост</a></p>
+                    <p><a href="{{ url_for('add_post') }}">Создать первый пост</a></p>
                 {% endif %}
             </div>
         {% endif %}
