@@ -310,18 +310,13 @@ def delete_project(project_id):
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
 
-def main():
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/postusers.db")
-    app.run()
-
-''''@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     form = ProfileForm(obj=current_user)
     if form.validate_on_submit():
         form.populate_obj(current_user)
-
+        db_sess = db_session.create_session()
         # Обработка загрузки файла
         if 'avatar' in request.files:
             file = request.files['avatar']
@@ -331,7 +326,6 @@ def profile():
                     old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
                     if os.path.exists(old_path):
                         os.remove(old_path)
-
                 # Генерируем уникальное имя файла
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
@@ -339,17 +333,21 @@ def profile():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                 current_user.avatar = unique_filename
 
-        db.session.commit()
+        db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile'))
 
     return render_template('profile/edit.html', form=form)
 
-
 @app.route('/profile/<int:user_id>')
 def view_profile(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('profile/view.html', user=user)'''
+    return render_template('profile/view.html', user=user)
+
+def main():
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    db_session.global_init("db/4.db")
+    app.run()
 
 if __name__ == '__main__':
     main()

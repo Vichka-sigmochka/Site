@@ -40,8 +40,20 @@
 <head>
     <title>Личный кабинет</title>
 </head>
+
 <body>
-<h2>Добро пожаловать, {{ username }}!</h2>
+    <h1>Профиль пользователя</h1>
+    <p>Имя: {{user.first_name}}</p>
+    <p>Фамилия: {{user.last_name}}</p>
+    <p>Возраст: {{user.age}} лет</p>
+    <p>Должность: {{user.position}}</p>
+    <p>Описание: {{user.description}}</p>
+    <p>Номер телефона: {{user.phone_number}}</p>
+    <p>Социальные сети: {{user.social_links}}</p>
+    <img src="{{ user.photo }}" alt="Фотография" />
+    <a href="{{ url_for('edit_profile', user_id=user.id) }}">Редактировать профиль</a>
+</body>
+<body>
 <a href="{{ url_for('logout') }}">Выйти</a>
 </body>
 </html>

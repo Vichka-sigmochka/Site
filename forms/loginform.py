@@ -1,9 +1,7 @@
 from flask_wtf import FlaskForm
-from data.users import User
-from wtforms import EmailField, BooleanField
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField, FileField, SubmitField
-from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
-
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField, IntegerField, FileField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired
 
 class LoginForm(FlaskForm):
     email = EmailField('Почта/Логин', validators=[DataRequired()])
@@ -12,27 +10,21 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 class RegisterForm(FlaskForm):
-    email = EmailField('Почта/Логин', validators=[DataRequired(), Email()])
+    email = EmailField('Почта/Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Подтвердите пароль', validators=[
-        DataRequired(), EqualTo('password')])
+    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
     submit = SubmitField('Зарегистрироваться')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('Этот email уже занят')
 
 class ProfileForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     age = IntegerField('Возраст')
-    specialization = TextAreaField('Специализация')
+    specialization = StringField('Специализация')
     bio = TextAreaField('О себе')
-    avatar = FileField('Аватарка')
+    avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')
 
     def validate_avatar(self, field):
