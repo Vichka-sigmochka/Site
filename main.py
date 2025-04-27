@@ -95,23 +95,29 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/profile', methods=['GET', 'POST'])
-@login_required
-def profile():
+@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
+def profile(user_id):
     db_sess = db_session.create_session()
-    form = ProfileForm()
+    form = ProfileForm(obj=current_user)
+    user = db_sess.query(User).get(user_id)
     if form.validate_on_submit():
         form.populate_obj(current_user)
+        user.name = form.name.data
+        user.surname = form.surname.data
+        user.email = form.email.data
+        user.age = form.age.data
+        user.specialization = form.specialization.data
+        user.bio = form.bio.data
 
         # Обработка загрузки файла
         if 'avatar' in request.files:
             file = request.files['avatar']
             if file and file.filename != '' and allowed_file(file.filename):
                 # Удаляем старый аватар если он есть
-                if current_user.avatar:
-                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
+                #if current_user.avatar:
+                    #old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
+                    #if os.path.exists(old_path):
+                    #    os.remove(old_path)
 
                 # Генерируем уникальное имя файла
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -122,45 +128,18 @@ def profile():
 
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile_view'))
 
     return render_template('profile_edit.html', form=form)
 
 
-@app.route('/profile/<int:user_id>')
-def view_profile(user_id):
+@app.route('/profile_view')
+def profile_view():
+    print(current_user)
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get_or_404(user_id)
+    user = db_sess.query(User).get(current_user)
     return render_template('profile_view.html', user=user)
 
-
-'''
-@app.route('/lk', methods=['GET'])
-def lk():
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).get(current_user.id)
-    return render_template('lk.html', user=user)
-
-
-@app.route('/edit_lk/<int:user_id>', methods=['GET', 'POST'])
-def edit_profile(user_id):
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).get(user_id)
-    if request.method == 'POST':
-        user.first_name = request.form['first_name']
-        user.last_name = request.form['last_name']
-        user.age = request.form['age']
-        user.position = request.form['position']
-        user.description = request.form['description']
-        user.phone_number = request.form['phone_number']
-        user.social_links = request.form['social_links']
-        user.photo = request.form['photo']  # Здесь нужно добавить обработку загрузки файлов
-
-        db_sess.commit()
-        return redirect(url_for('lk', user_id=user.id))
-
-    return render_template('edit_lk.html', user=user)
-'''
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():

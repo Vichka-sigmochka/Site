@@ -1,8 +1,10 @@
-{% extends "base.html" %}
-
-{% block title %}Редактирование профиля{% endblock %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать профиль</title>
+</head>
+<body>
     <h1>Редактирование профиля</h1>
     <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
@@ -53,4 +55,5 @@
         </div>
         {{ form.submit(class="btn btn-primary") }}
     </form>
-{% endblock %}
+</body>
+</html>

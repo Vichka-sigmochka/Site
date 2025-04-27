@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField, IntegerField, FileField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, ValidationError
+
 
 class LoginForm(FlaskForm):
     email = EmailField('Почта/Логин', validators=[DataRequired()])
@@ -26,9 +27,9 @@ class ProfileForm(FlaskForm):
     avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')
 
-    # def validate_avatar(self, field):
-    #     if field.data:
-    #         filename = field.data.filename.lower()
-    #         allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
-    #         if '.' not in filename or filename.rsplit('.', 1)[1] not in allowed_extensions:
-    #             raise ValidationError('Разрешены только файлы с расширениями: .jpg, .jpeg, .png, .gif')
+    def validate_avatar(self, field):
+        if field.data:
+            filename = field.data.filename.lower()
+            allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+            if '.' not in filename or filename.rsplit('.', 1)[1] not in allowed_extensions:
+                raise ValidationError('Разрешены только файлы с расширениями: .jpg, .jpeg, .png, .gif')
