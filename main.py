@@ -8,6 +8,10 @@ from data.users import User, Post, Project
 import datetime
 import os
 from PIL import Image
+import warnings
+from sqlalchemy import exc as sa_exc
+warnings.simplefilter("default")
+warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 #import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
@@ -133,11 +137,10 @@ def profile(user_id):
     return render_template('profile_edit.html', form=form)
 
 
-@app.route('/profile_view')
-def profile_view():
-    print(current_user)
+@app.route('/profile_view/<int:user_id>')
+def profile_view(user_id):
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get(current_user)
+    user = db_sess.query(User).get_or_404(user_id)
     return render_template('profile_view.html', user=user)
 
 
@@ -146,6 +149,7 @@ def home():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).order_by(Post.user_id.desc()).all()
     posts_data = []
+    user = 0
     for post in posts:
         posts_data.append({
             'id': post.id,
@@ -153,7 +157,10 @@ def home():
             'description': post.description,
             'image': post.image,
         })
+        if current_user == post.author:
+            user = post.user_id
     return render_template('home.html',
+                           user=user,
                            posts=posts_data,
                            current_user=current_user,
                            title='Домашняя страница')
