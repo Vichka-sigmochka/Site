@@ -370,7 +370,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new_posts.db")
+    db_session.global_init("db/new.db")
     app.run()
 
 if __name__ == '__main__':
