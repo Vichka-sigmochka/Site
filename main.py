@@ -86,6 +86,9 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
+            if not user.avatar:
+                user.avatar = '1.jpg'
+                db_sess.commit()
             return redirect("/home")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
@@ -113,22 +116,26 @@ def profile():
         user.specialization = form.specialization.data
         user.bio = form.bio.data
 
-        # Обработка загрузки файла
         if 'avatar' in request.files:
             file = request.files['avatar']
             if file and file.filename != '' and allowed_file(file.filename):
-                # Удаляем старый аватар если он есть
-                #if current_user.avatar:
-                    #old_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.avatar)
-                    #if os.path.exists(old_path):
-                    #    os.remove(old_path)
+                try:
+                    if user.avatar and user.avatar != '1.jpg':
+                        old_path = os.path.join(app.config['UPLOAD_FOLDER'], user.avatar)
+                        if os.path.exists(old_path):
+                            os.remove(old_path)
+                except:
+                    print("No file")
 
-                # Генерируем уникальное имя файла
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
                 unique_filename = f"{timestamp}_{filename}"
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-                current_user.avatar = unique_filename
+                try:
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    user.avatar = unique_filename
+                except  Exception as e:
+                    flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
+
 
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')

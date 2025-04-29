@@ -12,12 +12,16 @@
     <h1>Профиль пользователя</h1>
     <p>Имя: {{ user.name }}</p>
     <p>Фамилия: {{ user.surname }}</p>
+    <p>Фамилия: {{ user.email }}</p>
     <p>Возраст: {{ user.age }} лет</p>
     <p>Должность: {{ user.specialization }}</p>
     <p>Описание: {{ user.bio }}</p>
-    <p>Номер телефона: {{ user.phone_number }}</p>
     <p>Социальные сети: {{ user.social_links }}</p>
-    <img src="{{ user.avatar }}" alt="Фотография" />
+        <div class="current-avatar">
+            <p>Текущий аватар:</p>
+            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+                 alt="Аватар" class="img-thumbnail" width="150">
+        </div>
     <a href="{{ url_for('profile') }}">Редактировать профиль</a>
 </body>
 </html>
