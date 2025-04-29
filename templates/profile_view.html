@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Профиль</title>
-</head>
+<header class="header">
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проеты</a>
+        <a href="/logout">Выйти</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
+</header>
 <body>
     <h1>Профиль пользователя</h1>
     <p>Имя: {{ user.name }}</p>
@@ -14,6 +18,6 @@
     <p>Номер телефона: {{ user.phone_number }}</p>
     <p>Социальные сети: {{ user.social_links }}</p>
     <img src="{{ user.avatar }}" alt="Фотография" />
-    <a href="{{ url_for('profile', user_id=user.id) }}">Редактировать профиль</a>
+    <a href="{{ url_for('profile') }}">Редактировать профиль</a>
 </body>
 </html>

@@ -99,11 +99,11 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
-def profile(user_id):
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
     db_sess = db_session.create_session()
     form = ProfileForm(obj=current_user)
-    user = db_sess.query(User).get(user_id)
+    user = db_sess.query(User).get(current_user.id)
     if form.validate_on_submit():
         form.populate_obj(current_user)
         user.name = form.name.data
@@ -137,10 +137,10 @@ def profile(user_id):
     return render_template('profile_edit.html', form=form)
 
 
-@app.route('/profile_view/<int:user_id>')
-def profile_view(user_id):
+@app.route('/profile_view')
+def profile_view():
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get_or_404(user_id)
+    user = db_sess.query(User).get(current_user.id)
     return render_template('profile_view.html', user=user)
 
 
@@ -149,7 +149,6 @@ def home():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).order_by(Post.user_id.desc()).all()
     posts_data = []
-    user = 0
     for post in posts:
         posts_data.append({
             'id': post.id,
@@ -157,10 +156,7 @@ def home():
             'description': post.description,
             'image': post.image,
         })
-        if current_user == post.author:
-            user = post.user_id
     return render_template('home.html',
-                           user=user,
                            posts=posts_data,
                            current_user=current_user,
                            title='Домашняя страница')
