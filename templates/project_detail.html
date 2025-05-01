@@ -22,7 +22,7 @@
         <div class="card-footer text-muted">
             Опубликовано: {{ project.date_created.strftime('%d.%m.%Y в %H:%M') }}
             {% if project.author %}
-                | Автор: {{ project.author.id }}
+                | Автор: {{ project.author.name }}
             {% endif %}
         </div>
     </div>

@@ -158,6 +158,8 @@ def home():
             'title': post.title,
             'description': post.description,
             'image': post.image,
+            'date_created': post.date_created,
+            'name': post.author.name
         })
     return render_template('home1.html',
                            posts=posts_data,
