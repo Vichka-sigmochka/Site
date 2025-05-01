@@ -1,0 +1,50 @@
+{% extends "base_for_home.html" %}
+
+{% block content %}
+    <main>
+        {# Основной блок постов #}
+        {% if posts and posts|length > 0 %}
+            {% for post in posts %}
+                <div class="post" style="margin-bottom: 30px; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+                    {# Заголовок поста #}
+                    <h2 style="margin-top: 0;">{{ post.title or "Без названия" }}</h2>
+
+                    {# Содержимое поста #}
+                    <div style="margin-bottom: 15px;">
+                        {{ post.content or "" }}
+                    </div>
+
+                    {# Изображение поста #}
+                    {% if post.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + post.image) }}"
+                             alt="{{ post.title or 'Изображение поста' }}"
+                             style="max-width: 100%; height: auto; margin-bottom: 15px;">
+                    {% endif %}
+
+                    {# Информация об авторе #}
+                    {% if post.author %}
+                        <p style="font-size: 0.9em; color: #666;">
+                            Автор: {{ post.author.username if post.author.username else post.author.name }}
+                        </p>
+                    {% endif %}
+
+                    {# Кнопка удаления для автора #}
+                    {% if current_user.is_authenticated and current_user == post.author %}
+                        <a href="{{ url_for('post_delete', post_id=post.id) }}"
+                           onclick="return confirm('Удалить этот пост?')"
+                           style="color: #ff0000; text-decoration: none;">
+                            Удалить
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="padding: 20px; background: #f5f5f5; border-radius: 5px;">
+                <p>Пока нет ни одного поста.</p>
+                {% if current_user.is_authenticated %}
+                    <p><a href="{{ url_for('add_post') }}">Создать первый пост</a></p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

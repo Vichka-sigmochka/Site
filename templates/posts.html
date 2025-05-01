@@ -9,11 +9,18 @@
     {% endif %}
 
     <div class="row">
-        {% for post in posts %}
+    {% for post in posts %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 {% if post.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + post.image) }}" class="card-img-top" alt="{{ post.title }}">
+                    <div class="card-img-container" style="height: 200px; overflow: hidden;">  <!-- Фиксированная высота контейнера -->
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + post.image) }}"
+                            class="card-img-top img-fluid"
+                            alt="{{ post.title }}"
+                            style="width: 100%; height: 100%; object-fit: cover;"
+                        >
+                    </div>
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ post.title }}</h5>

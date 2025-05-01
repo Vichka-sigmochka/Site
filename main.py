@@ -7,6 +7,7 @@ from data import db_session
 from data.users import User, Post, Project
 import datetime
 import os
+from io import BytesIO
 from PIL import Image
 import warnings
 from sqlalchemy import exc as sa_exc
@@ -38,11 +39,6 @@ def load_user(user_id):
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def resize_image(image_path, max_size=(800, 800)):
-    img = Image.open(image_path)
-    img.thumbnail(max_size)
-    img.save(image_path)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -163,7 +159,7 @@ def home():
             'description': post.description,
             'image': post.image,
         })
-    return render_template('home.html',
+    return render_template('home1.html',
                            posts=posts_data,
                            current_user=current_user,
                            title='Домашняя страница')
