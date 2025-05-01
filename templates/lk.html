@@ -29,18 +29,27 @@
 <body>
 
     <header class="header">
-        <a href="/about">Обо мне</a>
-        <a href="/lk">ЛК</a>
+        <a href="/profile">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
         <a href="/projects">Проеты</a>
-        <a href="/life">Моя жизнь</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
         <a href="/logout">Выйти</a>
     </header>
 </body>
-<head>
-    <title>Личный кабинет</title>
-</head>
 <body>
-<h2>Добро пожаловать, {{ username }}!</h2>
+    <h1>Профиль пользователя</h1>
+    <p>Имя: {{user.name}}</p>
+    <p>Фамилия: {{user.surname}}</p>
+    <p>Возраст: {{user.age}} лет</p>
+    <p>Должность: {{user.position}}</p>
+    <p>Описание: {{user.description}}</p>
+    <p>Номер телефона: {{user.phone_number}}</p>
+    <p>Социальные сети: {{user.social_links}}</p>
+    <img src="{{ user.photo }}" alt="Фотография" />
+    <a href="{{ url_for('edit_profile', user_id=user.id) }}">Редактировать профиль</a>
+</body>
+<body>
 <a href="{{ url_for('logout') }}">Выйти</a>
 </body>
 </html>

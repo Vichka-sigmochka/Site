@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<header class="header">
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проеты</a>
+        <a href="/logout">Выйти</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
+</header>
+<body>
+    <h1>Профиль пользователя</h1>
+    <p>Имя: {{ user.name }}</p>
+    <p>Фамилия: {{ user.surname }}</p>
+    <p>Фамилия: {{ user.email }}</p>
+    <p>Возраст: {{ user.age }} лет</p>
+    <p>Должность: {{ user.specialization }}</p>
+    <p>Описание: {{ user.bio }}</p>
+    <p>Социальные сети: {{ user.social_links }}</p>
+        <div class="current-avatar">
+            <p>Текущий аватар:</p>
+            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+                 alt="Аватар" class="img-thumbnail" width="150">
+        </div>
+    <a href="{{ url_for('profile') }}">Редактировать профиль</a>
+</body>
+</html>

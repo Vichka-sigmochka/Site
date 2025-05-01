@@ -1,13 +1,17 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.loginform import RegisterForm, LoginForm
+from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
 from data.users import User, Post, Project
 import datetime
 import os
 from PIL import Image
+import warnings
+from sqlalchemy import exc as sa_exc
+warnings.simplefilter("default")
+warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 #import sqlite3
 #from flask_sqlalchemy import SQLAlchemy
 
@@ -82,6 +86,9 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
+            if not user.avatar:
+                user.avatar = '1.jpg'
+                db_sess.commit()
             return redirect("/home")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
@@ -94,10 +101,55 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/lk')
-@login_required
-def dashboard():
-    return render_template('lk.html', username=current_user.name)
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    db_sess = db_session.create_session()
+    form = ProfileForm(obj=current_user)
+    user = db_sess.query(User).get(current_user.id)
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+        user.name = form.name.data
+        user.surname = form.surname.data
+        user.email = form.email.data
+        user.age = form.age.data
+        user.specialization = form.specialization.data
+        user.bio = form.bio.data
+
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename != '' and allowed_file(file.filename):
+                try:
+                    if user.avatar and user.avatar != '1.jpg':
+                        old_path = os.path.join(app.config['UPLOAD_FOLDER'], user.avatar)
+                        if os.path.exists(old_path):
+                            os.remove(old_path)
+                except:
+                    print("No file")
+
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = secure_filename(file.filename)
+                unique_filename = f"{timestamp}_{filename}"
+                try:
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    user.avatar = unique_filename
+                except  Exception as e:
+                    flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
+
+
+        db_sess.commit()
+        flash('Профиль успешно обновлен!', 'success')
+        return redirect(url_for('profile_view'))
+
+    return render_template('profile_edit.html', form=form)
+
+
+@app.route('/profile_view')
+def profile_view():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.id)
+    return render_template('profile_view.html', user=user)
+
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -370,7 +422,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new_posts.db")
+    db_session.global_init("db/new1.db")
     app.run()
 
 if __name__ == '__main__':
