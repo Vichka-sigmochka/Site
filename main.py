@@ -7,14 +7,10 @@ from data import db_session
 from data.users import User, Post, Project
 import datetime
 import os
-from io import BytesIO
-from PIL import Image
 import warnings
 from sqlalchemy import exc as sa_exc
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
-#import sqlite3
-#from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
@@ -30,6 +26,7 @@ UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -131,8 +128,6 @@ def profile():
                     user.avatar = unique_filename
                 except  Exception as e:
                     flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
-
-
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile_view'))
@@ -159,9 +154,10 @@ def home():
             'description': post.description,
             'image': post.image,
             'date_created': post.date_created,
-            'name': post.author.name
+            'name': post.author.name,
+            'user_id': post.author.id
         })
-    return render_template('home1.html',
+    return render_template('home.html',
                            posts=posts_data,
                            current_user=current_user,
                            title='Домашняя страница')
@@ -283,6 +279,17 @@ def delete_post(post_id):
 def friends():
     return "friends"
 
+@app.route('/profile_author_post/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def profile_author_post(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(user_id)
+    return render_template('profile_author_post.html', user=user)
+
+@app.route('/add_friend')
+def add_friend():
+    return "add_friend"
+
 @app.route('/find')
 def find():
     return render_template('search.html')
@@ -298,7 +305,6 @@ def search():
             data.append((user.name, user.surname))
             i += 1
     except:
-        print(data)
         query = request.args.get('q', '').lower()
         if not query:
             return jsonify([])

@@ -10,6 +10,7 @@
 
     <div class="row">
         {% for project in projects %}
+        {% if current_user.is_authenticated and current_user == project.author %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 {% if project.image %}
@@ -32,10 +33,7 @@
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="col-12">
-            <div class="alert alert-info">Пока нет ни одного проекта.</div>
-        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>
