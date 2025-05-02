@@ -310,12 +310,18 @@ def search():
         while True:
             user = db_sess.query(User).get(i)
             data.append((user.name, user.surname))
+            data.append((user.specialization))
             i += 1
     except:
         query = request.args.get('q', '').lower()
         if not query:
             return jsonify([])
-        ans = [f'{s[0]} {s[1]}' for s in data if s[0].lower().startswith(query)]
+        ans = []
+        for s in data:
+            if type(s) == str and s.lower().startswith(query):
+                ans.append(s)
+            if type(s) == tuple and s[0].lower().startswith(query):
+                ans.append(f'{s[0]} {s[1]}')
         return jsonify(ans[:5])
 
 @app.route('/projects')
@@ -323,6 +329,11 @@ def projects():
     db_sess = db_session.create_session()
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
+
+@app.route('/like_project/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def like_project(user_id):
+    return 'like'
 
 @app.route('/add_project', methods=['GET', 'POST'])
 @login_required

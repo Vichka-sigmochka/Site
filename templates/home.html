@@ -21,7 +21,14 @@
                     <p class="card-text">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
                 </div>
                 <div class="card-footer text-muted">
-                Опубликовано: {{ post.date_created.strftime('%d.%m.%Y в %H:%M') }} | Автор: <a href="{{ url_for('profile_author_post', user_id=post.user_id) }}" style="display: inline;">{{ post.name }}</a>
+                Опубликовано: {{ post.date_created.strftime('%d.%m.%Y') }} | Автор: <a href="{{ url_for('profile_author_post', user_id=post.user_id) }}" style="display: inline;">{{ post.name }}</a>
+                </div>
+                <div class="likes">
+                <form action="{{ url_for('like_project', user_id=post.user_id) }}" method="POST">
+                <button type="submit">
+                    ❤️ {{ 0 }}
+                </button>
+                </form>
                 </div>
             </div>
         </div>
