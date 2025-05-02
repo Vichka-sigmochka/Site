@@ -4,11 +4,13 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project
+from data.users import User, Post, Project, Like
 import datetime
 import os
 from PIL import Image
 import warnings
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import exc as sa_exc
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
@@ -19,6 +21,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -27,6 +30,8 @@ UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+db = SQLAlchemy()
 
 
 @login_manager.user_loader
@@ -152,18 +157,26 @@ def profile_view():
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     db_sess = db_session.create_session()
-    posts = db_sess.query(Post).order_by(Post.user_id.desc()).all()
+    posts = db_sess.query(Post).options(
+        db.joinedload(Post.author),
+              db.joinedload(Post.likes)
+    ).order_by(Post.date_created.desc()).all()
     posts_data = []
     for post in posts:
-        posts_data.append({
+        post_data = {
             'id': post.id,
             'title': post.title,
             'description': post.description,
             'image': post.image,
             'date_created': post.date_created,
-            'name': post.author.name,
-            'user_id': post.author.id
-        })
+            'name': post.author.name if post.author else 'Неизвестный автор',
+            'user_id': post.author.id if post.author else None,
+            'likes': [like.user_id for like in post.likes],
+            'is_liked': False
+        }
+        if current_user.is_authenticated:
+            post_data['is_liked'] = current_user.id in post_data['likes']
+        posts_data.append(post_data)
     return render_template('home.html',
                            posts=posts_data,
                            current_user=current_user,
@@ -330,10 +343,33 @@ def projects():
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
 
-@app.route('/like_project/<int:user_id>', methods=['GET', 'POST'])
+
+@app.route('/toggle_like/<int:post_id>', methods=['POST'])
 @login_required
-def like_project(user_id):
-    return 'like'
+def toggle_like(post_id):
+    db_sess = db_session.create_session()
+    post = db_sess.query(Post).get(post_id)
+    if not post:
+        os.abort(404)
+    like = db_sess.query(Like).filter_by(
+        user_id=current_user.id,
+        post_id=post_id
+    ).first()
+    if like:
+        db_sess.delete(like)
+        action = 'unliked'
+    else:
+        new_like = Like(user_id=current_user.id, post_id=post_id)
+        db_sess.add(new_like)
+        action = 'liked'
+    db_sess.commit()
+    likes_count = db_sess.query(Like).filter_by(post_id=post_id).count()
+    return jsonify({
+        'status': 'success',
+        'action': action,
+        'likes_count': likes_count,
+        'post_id': post_id
+    })
 
 @app.route('/add_project', methods=['GET', 'POST'])
 @login_required
@@ -444,7 +480,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new1.db")
+    db_session.global_init("db/new2.db")
     app.run()
 
 if __name__ == '__main__':
