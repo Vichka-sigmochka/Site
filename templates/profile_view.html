@@ -12,7 +12,7 @@
     <h1>Профиль пользователя</h1>
     <p>Имя: {{ user.name }}</p>
     <p>Фамилия: {{ user.surname }}</p>
-    <p>Фамилия: {{ user.email }}</p>
+    <p>Почта: {{ user.email }}</p>
     <p>Возраст: {{ user.age }} лет</p>
     <p>Должность: {{ user.specialization }}</p>
     <p>Описание: {{ user.bio }}</p>
@@ -22,6 +22,6 @@
             <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
                  alt="Аватар" class="img-thumbnail" width="150">
         </div>
-    <a href="{{ url_for('profile') }}">Редактировать профиль</a>
+    <a href="{{ url_for('profile_edit') }}">Редактировать профиль</a>
 </body>
 </html>

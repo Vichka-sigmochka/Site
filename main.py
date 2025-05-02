@@ -12,8 +12,7 @@ import warnings
 from sqlalchemy import exc as sa_exc
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
-#import sqlite3
-#from flask_sqlalchemy import SQLAlchemy
+
 
 
 app = Flask(__name__)
@@ -39,10 +38,6 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def resize_image(image_path, max_size=(800, 800)):
-    img = Image.open(image_path)
-    img.thumbnail(max_size)
-    img.save(image_path)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -102,7 +97,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile_edit', methods=['GET', 'POST'])
 def profile():
     db_sess = db_session.create_session()
     form = ProfileForm(obj=current_user)
