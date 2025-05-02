@@ -102,7 +102,7 @@ def logout():
 
 
 @app.route('/profile_edit', methods=['GET', 'POST'])
-def profile():
+def profile_edit():
     db_sess = db_session.create_session()
     form = ProfileForm(obj=current_user)
     user = db_sess.query(User).get(current_user.id)

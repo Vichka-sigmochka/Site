@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Редактирование профиля</h1>
-    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('profile_edit') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.name.label }}
