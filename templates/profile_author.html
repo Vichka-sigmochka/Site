@@ -1,0 +1,82 @@
+<!-- В секции с кнопкой дружбы -->
+<div class="friend-actions">
+    {% if current_user.is_authenticated and current_user.id != user.id %}
+        {% if current_user.is_friend(user) %}
+            <button class="btn btn-success" disabled>
+                <i class="fas fa-user-friends"></i> Друзья
+            </button>
+        {% elif current_user.has_pending_request_to(user) %}
+            <button class="btn btn-secondary" disabled>
+                <i class="fas fa-clock"></i> Запрос отправлен
+            </button>
+        {% elif current_user.has_pending_request_from(user) %}
+            <div class="btn-group">
+                <button class="btn btn-success accept-friend"
+                        data-friendship-id="{{ current_user.get_friendship_with(user).id }}">
+                    <i class="fas fa-check"></i> Принять
+                </button>
+                <button class="btn btn-danger reject-friend"
+                        data-friendship-id="{{ current_user.get_friendship_with(user).id }}">
+                    <i class="fas fa-times"></i> Отклонить
+                </button>
+            </div>
+        {% else %}
+            <button class="btn btn-primary add-friend" data-user-id="{{ user.id }}">
+                <i class="fas fa-user-plus"></i> Добавить в друзья
+            </button>
+        {% endif %}
+    {% endif %}
+</div>
+
+<!-- JavaScript для обработки действий -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавление в друзья
+    document.querySelector('.add-friend')?.addEventListener('click', function() {
+        const userId = this.dataset.userId;
+        fetch(`/add_friend/${userId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Обновляем страницу для отображения нового состояния
+            } else {
+                alert(data.message);
+            }
+        });
+    });
+
+    // Принятие запроса
+    document.querySelector('.accept-friend')?.addEventListener('click', function() {
+        const friendshipId = this.dataset.friendshipId;
+        fetch(`/accept_friend/${friendshipId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    });
+
+    // Отклонение запроса
+    document.querySelector('.reject-friend')?.addEventListener('click', function() {
+        const friendshipId = this.dataset.friendshipId;
+        fetch(`/reject_friend/${friendshipId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    });
+});
+</script>

@@ -10,7 +10,6 @@ import os
 from PIL import Image
 import warnings
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import exc as sa_exc
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
@@ -21,7 +20,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
-csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -304,11 +302,7 @@ def friends():
 def profile_author_post(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
-    return render_template('profile_author_post.html', user=user)
-
-@app.route('/add_friend')
-def add_friend():
-    return "add_friend"
+    return render_template('profile_author.html', user=user)
 
 @app.route('/find')
 def find():
@@ -480,7 +474,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new2.db")
+    db_session.global_init("db/new4.db")
     app.run()
 
 if __name__ == '__main__':

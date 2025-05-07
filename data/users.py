@@ -5,6 +5,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 #from datetime import datetime
+from data import db_session
 
 
 class User(SqlAlchemyBase, UserMixin):
@@ -32,6 +33,9 @@ class User(SqlAlchemyBase, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def is_friend(self, user):
+        return self.friends.filter(Friendship.friend_id == user.id).count() > 0
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'
@@ -71,3 +75,4 @@ class Like(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'), nullable=False)
+
