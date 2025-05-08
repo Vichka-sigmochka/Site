@@ -128,7 +128,7 @@ def profile_edit():
                     flash(f'Ошибка при сохранение файла')
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
-                unique_filename = f"{timestamp}_{filename}"
+                unique_filename = f"{timestamp}.{filename}"
                 try:
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                     user.avatar = unique_filename
@@ -486,26 +486,27 @@ def delete_project(project_id):
 @app.route('/add_friend/<int:friend_id>')
 @login_required
 def add_friend(friend_id):
-    db_sess = db_session.create_session()
     if current_user.id == friend_id:
         flash('Вы не можете добавить себя в друзья', 'danger')
-    friend = db_sess.query(Friendship).all()
-    friends = set()
-    for i in friend:
-        if i.user_id == current_user.id:
-            friends.add(i.friend_id)
-    if friend_id in friends:
-        flash('Этот пользователь уже в ваших друзьях', 'danger')
     else:
-        try:
-            new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
-            db_sess.add(new_friendship)
-            new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
-            db_sess.add(new_friendship)
-        except:
-            flash(f'Ошибка при добавление пользователя в друзья', 'danger')
-    db_sess.commit()
-    flash('Пользователь добавлен в друзья!', 'success')
+        db_sess = db_session.create_session()
+        friend = db_sess.query(Friendship).all()
+        friends = set()
+        for i in friend:
+            if i.user_id == current_user.id:
+                friends.add(i.friend_id)
+        if friend_id in friends:
+            flash('Этот пользователь уже в ваших друзьях', 'danger')
+        else:
+            try:
+                new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+                db_sess.add(new_friendship)
+                new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
+                db_sess.add(new_friendship)
+                db_sess.commit()
+            except:
+                flash(f'Ошибка при добавление пользователя в друзья', 'danger')
+        flash('Пользователь добавлен в друзья!', 'success')
     return redirect(url_for('home'))
 
 

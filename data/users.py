@@ -4,7 +4,7 @@ from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship, backref
-#from datetime import datetime
+# from datetime import datetime
 from data import db_session
 
 
@@ -36,7 +36,6 @@ class User(SqlAlchemyBase, UserMixin):
         return check_password_hash(self.hashed_password, password)
 
 
-
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'
 
@@ -58,6 +57,7 @@ class Post(SqlAlchemyBase):
             return False
         return any(like.user_id == user.id for like in self.likes)
 
+
 class Project(SqlAlchemyBase):
     __tablename__ = 'project'
 
@@ -68,6 +68,7 @@ class Project(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
 
+
 class Like(SqlAlchemyBase):
     __tablename__ = 'like'
 
@@ -75,6 +76,7 @@ class Like(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'), nullable=False)
+
 
 class Friendship(SqlAlchemyBase):
     __tablename__ = 'friendship'

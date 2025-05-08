@@ -1,4 +1,4 @@
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField, IntegerField, FileField
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -11,6 +11,7 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
+
 class RegisterForm(FlaskForm):
     email = EmailField('Почта/Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
@@ -18,6 +19,7 @@ class RegisterForm(FlaskForm):
     surname = StringField('Фамилия', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
     submit = SubmitField('Зарегистрироваться')
+
 
 class ProfileForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired(), Length(max=50)])
@@ -31,7 +33,10 @@ class ProfileForm(FlaskForm):
 
     def validate_avatar(self, field):
         if field.data:
-            filename = field.data.filename.lower()
+            try:
+                filename = field.data.filename.lower()
+            except:
+                filename = field.data
             allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
             if '.' not in filename or filename.rsplit('.', 1)[1] not in allowed_extensions:
                 raise ValidationError('Разрешены только файлы с расширениями: .jpg, .jpeg, .png, .gif')
