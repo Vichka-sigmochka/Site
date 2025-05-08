@@ -315,11 +315,8 @@ def find():
 def search():
     db_sess = db_session.create_session()
     query = request.args.get('q', '').lower()
-
     if not query:
         return jsonify([])
-
-    # Для AJAX-запросов (автодополнение)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         data = []
         try:
@@ -338,15 +335,12 @@ def search():
                 if type(s) == tuple and s[0].lower().startswith(query):
                     ans.append(f'{s[0]} {s[1]}')
             return jsonify(ans[:5])
-
-    # Для обычного поиска (полная страница результатов)
     users = db_sess.query(User).filter(
         (func.lower(User.name).startswith(query)) |
         (func.lower(User.surname).startswith(query)) |
         (func.lower(User.specialization).startswith(query)) |
         (func.lower(User.town).startswith(query))
     ).all()
-
     return render_template('search_results.html', users=users, query=query)
 
 
@@ -354,14 +348,12 @@ def search():
 def search_results():
     db_sess = db_session.create_session()
     query = request.args.get('q', '').lower()
-
     users = db_sess.query(User).filter(
         (func.lower(User.name).startswith(query)) |
         (func.lower(User.surname).startswith(query)) |
         (func.lower(User.specialization).startswith(query)) |
         (func.lower(User.town).startswith(query))
     ).all()
-
     return render_template('search_results.html', users=users, query=query)
 
 @app.route('/projects')
@@ -369,7 +361,6 @@ def projects():
     db_sess = db_session.create_session()
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
-
 
 @app.route('/toggle_like/<int:post_id>', methods=['POST'])
 @login_required
