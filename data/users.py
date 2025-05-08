@@ -3,7 +3,7 @@ import sqlalchemy
 from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 #from datetime import datetime
 from data import db_session
 
@@ -27,25 +27,13 @@ class User(SqlAlchemyBase, UserMixin):
     posts = relationship('Post', backref='author', lazy=True)
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
-    friends = relationship('Friend', backref='user', lazy=True)
+    friends = relationship('Friendship', backref='user', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
-
-
-friendships = sqlalchemy.Table('friendships', SqlAlchemyBase.metadata,
-    sqlalchemy.Column('user_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True),
-    sqlalchemy.Column('friend_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True)
-)
-
-User.friends = relationship("User",
-                            secondary=friendships,
-                            primaryjoin=User.id == friendships.c.user_id,
-                            secondaryjoin=User.id == friendships.c.friend_id,
-                            backref="friend_of")
 
 
 
@@ -88,11 +76,8 @@ class Like(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'), nullable=False)
 
-'''
-class Friend(SqlAlchemyBase):
-    __tablename__ = 'friend'
-
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    friend_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
-'''
+class Friendship(SqlAlchemyBase):
+    __tablename__ = 'friendship'
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True)
+    friend_id = sqlalchemy.Column(sqlalchemy.Integer)
+    created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

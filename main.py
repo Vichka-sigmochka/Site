@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like
+from data.users import User, Post, Project, Like, Friendship
 import datetime
 import os
 import warnings
@@ -112,7 +112,6 @@ def profile_edit():
         user.age = form.age.data
         user.specialization = form.specialization.data
         user.bio = form.bio.data
-
         if 'avatar' in request.files:
             file = request.files['avatar']
             if file and file.filename != '' and allowed_file(file.filename):
@@ -122,8 +121,7 @@ def profile_edit():
                         if os.path.exists(old_path):
                             os.remove(old_path)
                 except:
-                    print("No file")
-
+                    flash(f'Ошибка при сохранение файла')
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
                 unique_filename = f"{timestamp}_{filename}"
@@ -132,7 +130,6 @@ def profile_edit():
                     user.avatar = unique_filename
                 except  Exception as e:
                     flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
-
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile_view'))
@@ -467,18 +464,27 @@ def delete_project(project_id):
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
 
-@app.route('/add_friend/int<friend_id>', methods=['GET'])
+@app.route('/add_friend/<int:friend_id>')
 @login_required
 def add_friend(friend_id):
     db_sess = db_session.create_session()
-    db_sess.commit()
-    return redirect(url_for('home'))
+    if current_user.id == friend_id:
+        flash('Вы не можете добавить себя в друзья', 'danger')
+        return redirect(url_for('search'))
 
+    new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+    db_sess.add(new_friendship)
+    new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
+    db_sess.add(new_friendship)
+    db_sess.commit()
+
+    flash('Пользователь добавлен в друзья!', 'success')
+    return redirect(url_for('home'))
 
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new6.db")
+    db_session.global_init("db/new4.db")
     app.run()
 
 if __name__ == '__main__':
