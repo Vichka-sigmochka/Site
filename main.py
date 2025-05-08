@@ -470,21 +470,29 @@ def add_friend(friend_id):
     db_sess = db_session.create_session()
     if current_user.id == friend_id:
         flash('Вы не можете добавить себя в друзья', 'danger')
-        return redirect(url_for('search'))
-
-    new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
-    db_sess.add(new_friendship)
-    new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
-    db_sess.add(new_friendship)
+    friend = db_sess.query(Friendship).all()
+    friends = set()
+    for i in friend:
+        if i.user_id == current_user.id:
+            friends.add(i.friend_id)
+    if friend_id in friends:
+        flash('Этот пользователь уже в ваших друзьях', 'danger')
+    else:
+        try:
+            new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+            db_sess.add(new_friendship)
+            new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
+            db_sess.add(new_friendship)
+        except:
+            flash(f'Ошибка при добавление пользователя в друзья', 'danger')
     db_sess.commit()
-
     flash('Пользователь добавлен в друзья!', 'success')
     return redirect(url_for('home'))
 
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new4.db")
+    db_session.global_init("db/new5.db")
     app.run()
 
 if __name__ == '__main__':
