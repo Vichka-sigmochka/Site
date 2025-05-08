@@ -7,10 +7,10 @@ from data import db_session
 from data.users import User, Post, Project, Like
 import datetime
 import os
-from PIL import Image
 import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
+
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
@@ -40,11 +40,6 @@ def load_user(user_id):
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def resize_image(image_path, max_size=(800, 800)):
-    img = Image.open(image_path)
-    img.thumbnail(max_size)
-    img.save(image_path)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -472,9 +467,18 @@ def delete_project(project_id):
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
 
+@app.route('/add_friend/int<friend_id>', methods=['GET'])
+@login_required
+def add_friend(friend_id):
+    db_sess = db_session.create_session()
+    db_sess.commit()
+    return redirect(url_for('home'))
+
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new4.db")
+    db_session.global_init("db/new6.db")
     app.run()
 
 if __name__ == '__main__':

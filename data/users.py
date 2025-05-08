@@ -27,6 +27,7 @@ class User(SqlAlchemyBase, UserMixin):
     posts = relationship('Post', backref='author', lazy=True)
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
+    friends = relationship('Friend', backref='user', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -34,8 +35,19 @@ class User(SqlAlchemyBase, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
-    def is_friend(self, user):
-        return self.friends.filter(Friendship.friend_id == user.id).count() > 0
+
+friendships = sqlalchemy.Table('friendships', SqlAlchemyBase.metadata,
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True),
+    sqlalchemy.Column('friend_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True)
+)
+
+User.friends = relationship("User",
+                            secondary=friendships,
+                            primaryjoin=User.id == friendships.c.user_id,
+                            secondaryjoin=User.id == friendships.c.friend_id,
+                            backref="friend_of")
+
+
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'
@@ -76,3 +88,11 @@ class Like(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'), nullable=False)
 
+'''
+class Friend(SqlAlchemyBase):
+    __tablename__ = 'friend'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    friend_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
+'''

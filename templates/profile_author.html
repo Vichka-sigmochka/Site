@@ -1,82 +1,47 @@
-<!-- В секции с кнопкой дружбы -->
-<div class="friend-actions">
-    {% if current_user.is_authenticated and current_user.id != user.id %}
-        {% if current_user.is_friend(user) %}
-            <button class="btn btn-success" disabled>
-                <i class="fas fa-user-friends"></i> Друзья
-            </button>
-        {% elif current_user.has_pending_request_to(user) %}
-            <button class="btn btn-secondary" disabled>
-                <i class="fas fa-clock"></i> Запрос отправлен
-            </button>
-        {% elif current_user.has_pending_request_from(user) %}
-            <div class="btn-group">
-                <button class="btn btn-success accept-friend"
-                        data-friendship-id="{{ current_user.get_friendship_with(user).id }}">
-                    <i class="fas fa-check"></i> Принять
-                </button>
-                <button class="btn btn-danger reject-friend"
-                        data-friendship-id="{{ current_user.get_friendship_with(user).id }}">
-                    <i class="fas fa-times"></i> Отклонить
-                </button>
-            </div>
-        {% else %}
-            <button class="btn btn-primary add-friend" data-user-id="{{ user.id }}">
-                <i class="fas fa-user-plus"></i> Добавить в друзья
-            </button>
-        {% endif %}
-    {% endif %}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<style>
+        /* Стили для шапки */
+        .header {
+            background-color: #f0f0f0; /* Светло-серый фон */
+            padding: 10px 0; /* Отступы сверху и снизу */
+            text-align: center; /* Выравнивание ссылок по центру */
+            font-family: sans-serif; /* Шрифт */
+        }
 
-<!-- JavaScript для обработки действий -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавление в друзья
-    document.querySelector('.add-friend')?.addEventListener('click', function() {
-        const userId = this.dataset.userId;
-        fetch(`/add_friend/${userId}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload(); // Обновляем страницу для отображения нового состояния
-            } else {
-                alert(data.message);
-            }
-        });
-    });
+        .header a {
+            display: inline-block; /* Расположение ссылок в одну строку */
+            margin: 0 15px; /* Отступы между ссылками */
+            text-decoration: none; /* Убрать подчеркивание */
+            color: #333; /* Темно-серый цвет текста */
+            font-weight: bold; /* Жирный шрифт */
+        }
 
-    // Принятие запроса
-    document.querySelector('.accept-friend')?.addEventListener('click', function() {
-        const friendshipId = this.dataset.friendshipId;
-        fetch(`/accept_friend/${friendshipId}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
-    });
-
-    // Отклонение запроса
-    document.querySelector('.reject-friend')?.addEventListener('click', function() {
-        const friendshipId = this.dataset.friendshipId;
-        fetch(`/reject_friend/${friendshipId}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
-    });
-});
-</script>
+        .header a:hover {
+            color: #007bff; /* Цвет текста при наведении */
+        }
+</style>
+<header class="header">
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проеты</a>
+        <a href="/logout">Выйти</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
+</header>
+<body>
+    <h1>Об авторе поста</h1>
+    <p>Имя: {{ user.name }}</p>
+    <p>Фамилия: {{ user.surname }}</p>
+    <p>Почта: {{ user.email }}</p>
+    <p>Возраст: {{ user.age }} лет</p>
+    <p>Должность: {{ user.specialization }}</p>
+    <p>Описание: {{ user.bio }}</p>
+        <div class="current-avatar">
+            <p>Текущий аватар:</p>
+            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+                 alt="Аватар" class="img-thumbnail" width="150">
+        </div>
+    <a href="{{ url_for('add_friend', friend_id=user.id) }}">Добавить в друзья</a>
+</body>
+</html>
