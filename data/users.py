@@ -20,6 +20,7 @@ class User(SqlAlchemyBase, UserMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     age = sqlalchemy.Column(sqlalchemy.Integer)
     specialization = sqlalchemy.Column(sqlalchemy.String(100))
+    town = sqlalchemy.Column(sqlalchemy.String(100))
     bio = sqlalchemy.Column(sqlalchemy.Text)
     avatar = sqlalchemy.Column(sqlalchemy.String(100))
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
@@ -34,8 +35,6 @@ class User(SqlAlchemyBase, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
-    def is_friend(self, user):
-        return self.friends.filter(Friendship.friend_id == user.id).count() > 0
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'

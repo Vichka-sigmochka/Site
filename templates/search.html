@@ -1,146 +1,92 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поиск с подсказками</title>
+    <title>Поиск</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
         .search-container {
-            width: 600px;
-            text-align: center;
+            margin: 50px auto;
+            width: 500px;
         }
-        .search-form {
-            display: flex;
-            position: relative;
-        }
-        .search-box {
+        #search-input {
             width: 100%;
-            padding: 12px 20px;
+            padding: 10px;
             font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 24px 0 0 24px;
-            outline: none;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .search-box:focus {
-            border-color: #4d90fe;
-        }
-        .search-button {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #4d90fe;
-            color: white;
-            border: none;
-            border-radius: 0 24px 24px 0;
-            cursor: pointer;
-        }
-        .search-button:hover {
-            background-color: #357ae8;
-        }
-        .suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            border: 1px solid #ddd;
-            border-radius: 0 0 8px 8px;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        #suggestions {
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
             display: none;
-            z-index: 100;
         }
         .suggestion-item {
-            padding: 12px 20px;
-            text-align: left;
+            padding: 8px 10px;
             cursor: pointer;
         }
         .suggestion-item:hover {
-            background-color: #f5f5f5;
-        }
-        .logo {
-            margin-bottom: 20px;
-            font-size: 32px;
-            font-weight: bold;
-            color: #ff0000;
+            background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
     <div class="search-container">
-        <div class="logo">Поисковик</div>
-        <form class="search-form" id="searchForm" action="/home" method="GET">
-            <input type="text" class="search-box" id="searchInput" name="q" placeholder="Введите запрос..." autocomplete="off">
-            <button type="submit" class="search-button">Найти</button>
-            <div class="suggestions" id="suggestions"></div>
-        </form>
+        <input type="text" id="search-input" placeholder="Введите имя, фамилию, специализацию или город...">
+        <div id="suggestions"></div>
+        <button id="search-button">Найти</button>
     </div>
 
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsContainer = document.getElementById('suggestions');
-        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('search-input');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const searchButton = document.getElementById('search-button');
 
-        function submitForm() {
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'q';
-            hiddenInput.value = 'Привет!';
-            searchForm.appendChild(hiddenInput);
-
-            searchInput.disabled = true;
-
-            searchForm.submit();
-            return false;
-        }
-
-        searchForm.onsubmit = submitForm;
-
+        // Обработчик ввода
         searchInput.addEventListener('input', function() {
             const query = this.value.trim();
-
-            if (query.length === 0) {
-                suggestionsContainer.style.display = 'none';
+            if (query.length < 1) {
+                suggestionsDiv.style.display = 'none';
                 return;
             }
 
-            fetch(`/search?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(suggestions => {
-                    if (suggestions.length > 0) {
-                        suggestionsContainer.innerHTML = '';
-                        suggestions.forEach(suggestion => {
-                            const div = document.createElement('div');
-                            div.className = 'suggestion-item';
-                            div.textContent = suggestion;
-                            div.addEventListener('click', submitForm);
-                            suggestionsContainer.appendChild(div);
+            fetch(`/search?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    suggestionsDiv.innerHTML = '';
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = item;
+                        div.addEventListener('click', () => {
+                            window.location.href = `/search_results?q=${encodeURIComponent(query)}`;
                         });
-                        suggestionsContainer.style.display = 'block';
-                    } else {
-                        suggestionsContainer.style.display = 'none';
-                    }
-                });
+                        suggestionsDiv.appendChild(div);
+                    });
+                    suggestionsDiv.style.display = 'block';
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                }
+            });
         });
 
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Предотвращаем стандартное поведение
-                submitForm();
+        // Обработчик нажатия кнопки "Найти"
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                window.location.href = `/search_results?q=${encodeURIComponent(query)}`;
             }
         });
 
-        document.addEventListener('click', function(e) {
-            if (e.target !== searchInput && !e.target.classList.contains('suggestion-item')) {
-                suggestionsContainer.style.display = 'none';
+        // Обработчик нажатия Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    window.location.href = `/search_results?q=${encodeURIComponent(query)}`;
+                }
             }
         });
     </script>

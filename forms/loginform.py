@@ -25,6 +25,7 @@ class ProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     age = IntegerField('Возраст')
     specialization = StringField('Специализация', validators=[Length(max=100)])
+    town = StringField('Город', validators=[Length(max=100)])
     bio = TextAreaField('О себе')
     avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')

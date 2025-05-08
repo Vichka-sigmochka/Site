@@ -11,6 +11,7 @@ from PIL import Image
 import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
+from sqlalchemy import func
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
@@ -304,32 +305,64 @@ def profile_author_post(user_id):
     user = db_sess.query(User).get(user_id)
     return render_template('profile_author.html', user=user)
 
+
 @app.route('/find')
 def find():
     return render_template('search.html')
 
+
 @app.route('/search', methods=['GET'])
 def search():
     db_sess = db_session.create_session()
-    data = []
-    try:
-        i = 1
-        while True:
-            user = db_sess.query(User).get(i)
-            data.append((user.name, user.surname))
-            data.append((user.specialization))
-            i += 1
-    except:
-        query = request.args.get('q', '').lower()
-        if not query:
-            return jsonify([])
-        ans = []
-        for s in data:
-            if type(s) == str and s.lower().startswith(query):
-                ans.append(s)
-            if type(s) == tuple and s[0].lower().startswith(query):
-                ans.append(f'{s[0]} {s[1]}')
-        return jsonify(ans[:5])
+    query = request.args.get('q', '').lower()
+
+    if not query:
+        return jsonify([])
+
+    # Для AJAX-запросов (автодополнение)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = []
+        try:
+            i = 1
+            while True:
+                user = db_sess.query(User).get(i)
+                data.append((user.name, user.surname))
+                data.append((user.specialization))
+                data.append(user.town)
+                i += 1
+        except:
+            ans = []
+            for s in data:
+                if type(s) == str and s.lower().startswith(query):
+                    ans.append(s)
+                if type(s) == tuple and s[0].lower().startswith(query):
+                    ans.append(f'{s[0]} {s[1]}')
+            return jsonify(ans[:5])
+
+    # Для обычного поиска (полная страница результатов)
+    users = db_sess.query(User).filter(
+        (func.lower(User.name).startswith(query)) |
+        (func.lower(User.surname).startswith(query)) |
+        (func.lower(User.specialization).startswith(query)) |
+        (func.lower(User.town).startswith(query))
+    ).all()
+
+    return render_template('search_results.html', users=users, query=query)
+
+
+@app.route('/search_results')
+def search_results():
+    db_sess = db_session.create_session()
+    query = request.args.get('q', '').lower()
+
+    users = db_sess.query(User).filter(
+        (func.lower(User.name).startswith(query)) |
+        (func.lower(User.surname).startswith(query)) |
+        (func.lower(User.specialization).startswith(query)) |
+        (func.lower(User.town).startswith(query))
+    ).all()
+
+    return render_template('search_results.html', users=users, query=query)
 
 @app.route('/projects')
 def projects():
@@ -474,7 +507,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new4.db")
+    db_session.global_init("db/olli2.db")
     app.run()
 
 if __name__ == '__main__':
