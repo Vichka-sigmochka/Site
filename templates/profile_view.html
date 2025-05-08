@@ -16,12 +16,12 @@
     <p>Возраст: {{ user.age }} лет</p>
     <p>Должность: {{ user.specialization }}</p>
     <p>Описание: {{ user.bio }}</p>
-    <p>Социальные сети: {{ user.social_links }}</p>
-        <div class="current-avatar">
-            <p>Текущий аватар:</p>
-            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
-                 alt="Аватар" class="img-thumbnail" width="150">
-        </div>
+    <p>Город проживания: {{ user.city }}</p>
+    <div class="current-avatar">
+        <p>Текущий аватар:</p>
+        <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+             alt="Аватар" class="img-thumbnail" width="150">
+    </div>
     <a href="{{ url_for('profile_edit') }}">Редактировать профиль</a>
 </body>
 </html>

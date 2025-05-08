@@ -297,7 +297,18 @@ def delete_post(post_id):
 
 @app.route('/friends')
 def friends():
-    return "friends"
+    db_sess = db_session.create_session()
+    friend = db_sess.query(Friendship).all()
+    friends = []
+    for i in friend:
+        if i.user_id == current_user.id:
+            user = db_sess.query(User).get(i.friend_id)
+            friends += [user.name]
+        elif i.friend_id == current_user.id:
+            user = db_sess.query(User).get(i.user_id)
+            friends += [user.name]
+    db_sess.commit()
+    return render_template('friends.html', friends=friends)
 
 
 @app.route('/profile_author_post/<int:user_id>', methods=['GET', 'POST'])
@@ -495,24 +506,30 @@ def add_friend(friend_id):
         for i in friend:
             if i.user_id == current_user.id:
                 friends.add(i.friend_id)
+            elif i.friend_id == current_user.id:
+                friends.add(i.user_id)
         if friend_id in friends:
             flash('Этот пользователь уже в ваших друзьях', 'danger')
         else:
             try:
                 new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
                 db_sess.add(new_friendship)
-                new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
-                db_sess.add(new_friendship)
                 db_sess.commit()
+                flash('Пользователь добавлен в друзья!', 'success')
             except:
                 flash(f'Ошибка при добавление пользователя в друзья', 'danger')
-        flash('Пользователь добавлен в друзья!', 'success')
     return redirect(url_for('home'))
+
+
+@app.route('/delete_friend')
+@login_required
+def delete_friend():
+    return 'delete'
 
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new5.db")
+    db_session.global_init("db/new2.db")
     app.run()
 
 

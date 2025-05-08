@@ -37,6 +37,7 @@
     <p>Возраст: {{ user.age }} лет</p>
     <p>Должность: {{ user.specialization }}</p>
     <p>Описание: {{ user.bio }}</p>
+    <p>Город проживания: {{ user.city }}</p>
         <div class="current-avatar">
             <p>Текущий аватар:</p>
             <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"

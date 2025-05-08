@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<header class="header">
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проеты</a>
+        <a href="/logout">Выйти</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
+</header>
+<body>
+    <h2>Friends</h2>
+    <ul>
+        {% for friend in friends %}
+            <li>{{ friend }}</li>
+        {% else %}
+            <li>У вас нет друзей</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('find') }}"> Добавить друга</a>
+    <a href="{{ url_for('delete_friend') }}"> Удалить друга</a>
+</body>
+</html>
