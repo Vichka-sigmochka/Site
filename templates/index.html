@@ -1,48 +1,66 @@
-{% extends "base.html" %}
-
-{% block content %}
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шапка сайта</title>
-    <style>
-        /* Стили для шапки */
-        .header {
-            background-color: #f0f0f0; /* Светло-серый фон */
-            padding: 10px 0; /* Отступы сверху и снизу */
-            text-align: center; /* Выравнивание ссылок по центру */
-            font-family: sans-serif; /* Шрифт */
-        }
-
-        .header a {
-            display: inline-block; /* Расположение ссылок в одну строку */
-            margin: 0 15px; /* Отступы между ссылками */
-            text-decoration: none; /* Убрать подчеркивание */
-            color: #333; /* Темно-серый цвет текста */
-            font-weight: bold; /* Жирный шрифт */
-        }
-
-        .header a:hover {
-            color: #007bff; /* Цвет текста при наведении */
-        }
-    </style>
+    <title>Портфолио | Главная</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css" />
 </head>
 <body>
-
-    <header class="header">
-        <form action="" method="post" novalidate>
-         {{ form.hidden_tag() }}
-         <a href="/people">Люди {{ form.submit_login(type="submit", class="btn btn-primary") }} {{ form.submit_registration(type="submit", class="btn btn-primary") }} </a>
-        </form>
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">PortfolioHub</h1>
+                <nav class="main-nav">
+                    <form class="auth-form" action="" method="post" novalidate>
+                        <input id="csrf_token" name="csrf_token" type="hidden" value="ImIwOWNiMDdkNzY3ZTNkNmZhNjk2ZmZhMDFhYTBiZjg2NDUwOWU3ZTki.aBxwFg.c1hFYIreQT7JCRjmmm2co1pGUg4">
+                        <input class="btn btn-primary" id="submit_login" name="submit_login" type="submit" value="Войти"> <input class="btn btn-primary" id="submit_registration" name="submit_registration" type="submit" value="Зарегистрироваться">
+                    </form>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <h1>Содержимое сайта</h1>
-        <p>Здесь будет располагаться основной контент вашего сайта.</p>
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Создайте впечатляющее портфолио</h2>
+                    <p class="hero-text">Покажите свои работы, найдите сотрудников или вдохновляйтесь проектами других</p>
+                    <a href="#features" class="btn btn-primary btn-large">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <h3 class="section-title">Почему выбирают нас</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">👨‍💻</div>
+                        <h4>Профессиональное портфолио</h4>
+                        <p>Покажите свои лучшие работы в современном формате</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h4>Поиск специалистов</h4>
+                        <p>Найдите профессионалов для своего проекта</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💼</div>
+                        <h4>Карьерные возможности</h4>
+                        <p>Получайте предложения о работе от топовых компаний</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2023 PortfolioHub. Все права защищены.</p>
+        </div>
+    </footer>
 </body>
 </html>
-
-{% endblock %}
