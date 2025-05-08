@@ -78,6 +78,7 @@ class Like(SqlAlchemyBase):
 
 class Friendship(SqlAlchemyBase):
     __tablename__ = 'friendship'
+
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), primary_key=True)
     friend_id = sqlalchemy.Column(sqlalchemy.Integer)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

@@ -14,7 +14,6 @@ from sqlalchemy import exc as sa_exc
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
-
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -37,9 +36,11 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(int(user_id))
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -50,6 +51,7 @@ def index():
             return redirect('/login')
         return redirect('/register')
     return render_template('index.html', title='Главная страница', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -75,6 +77,7 @@ def register():
         return redirect('/index')
     return render_template('register.html', title='Регистрация', form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -91,6 +94,7 @@ def login():
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
+
 
 @app.route('/logout')
 @login_required
@@ -149,7 +153,7 @@ def home():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).options(
         db.joinedload(Post.author),
-              db.joinedload(Post.likes)
+        db.joinedload(Post.likes)
     ).order_by(Post.date_created.desc()).all()
     posts_data = []
     for post in posts:
@@ -172,11 +176,13 @@ def home():
                            current_user=current_user,
                            title='Домашняя страница')
 
+
 @app.route('/posts')
 def posts():
     db_sess = db_session.create_session()
     all_posts = db_sess.query(Post).order_by(Post.date_created.desc()).all()
     return render_template('posts.html', posts=all_posts)
+
 
 @app.route('/add_post', methods=['GET', 'POST'])
 @login_required
@@ -213,6 +219,7 @@ def add_post():
             return redirect(url_for('add_post'))
     return render_template('add_post.html')
 
+
 @app.route('/post/<int:post_id>')
 def post_detail(post_id):
     db_sess = db_session.create_session()
@@ -220,6 +227,7 @@ def post_detail(post_id):
     if not post:
         os.abort(404)
     return render_template('post_detail.html', post=post)
+
 
 @app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required
@@ -258,6 +266,7 @@ def edit_post(post_id):
             app.logger.error(f"Error editing post: {e}")
     return render_template('edit_post.html', post=post)
 
+
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post(post_id):
@@ -285,9 +294,11 @@ def delete_post(post_id):
         app.logger.error(f"Error deleting post: {e}")
     return redirect(url_for('posts'))
 
+
 @app.route('/friends')
 def friends():
     return "friends"
+
 
 @app.route('/profile_author_post/<int:user_id>', methods=['GET', 'POST'])
 @login_required
@@ -296,9 +307,11 @@ def profile_author_post(user_id):
     user = db_sess.query(User).get(user_id)
     return render_template('profile_author.html', user=user)
 
+
 @app.route('/find')
 def find():
     return render_template('search.html')
+
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -322,6 +335,7 @@ def search():
             if type(s) == tuple and s[0].lower().startswith(query):
                 ans.append(f'{s[0]} {s[1]}')
         return jsonify(ans[:5])
+
 
 @app.route('/projects')
 def projects():
@@ -356,6 +370,7 @@ def toggle_like(post_id):
         'likes_count': likes_count,
         'post_id': post_id
     })
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 @login_required
@@ -392,6 +407,7 @@ def add_project():
             return redirect(url_for('add_project'))
     return render_template('add_project.html')
 
+
 @app.route('/project/<int:project_id>')
 def project_detail(project_id):
     db_sess = db_session.create_session()
@@ -399,6 +415,7 @@ def project_detail(project_id):
     if not project:
         os.abort(404)
     return render_template('project_detail.html', project=project)
+
 
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
@@ -437,6 +454,7 @@ def edit_project(project_id):
             app.logger.error(f"Error editing project: {e}")
     return render_template('edit_project.html', project=project)
 
+
 @app.route('/delete_project/<int:project_id>', methods=['POST'])
 @login_required
 def delete_project(project_id):
@@ -463,6 +481,7 @@ def delete_project(project_id):
         flash(f'Ошибка при удалении проекта: {str(e)}', 'danger')
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
+
 
 @app.route('/add_friend/<int:friend_id>')
 @login_required
@@ -495,6 +514,7 @@ def main():
     db_session.global_init("db/new5.db")
     app.run()
 
+
 if __name__ == '__main__':
     main()
-    #app.run(port=8080, host='127.0.0.1')
+    # app.run(port=8080, host='127.0.0.1')
