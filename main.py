@@ -305,9 +305,6 @@ def friends():
         if i.user_id == current_user.id:
             user = db_sess.query(User).get(i.friend_id)
             friends += [(user.name, user.surname, user.avatar, user.id)]
-        elif i.friend_id == current_user.id:
-            user = db_sess.query(User).get(i.user_id)
-            friends += [(user.name, user.surname, user.avatar, user.id)]
     db_sess.commit()
     return render_template('friends.html', friends=friends)
 
@@ -529,13 +526,13 @@ def add_friend(friend_id):
         for i in friend:
             if i.user_id == current_user.id:
                 friends.add(i.friend_id)
-            elif i.friend_id == current_user.id:
-                friends.add(i.user_id)
         if friend_id in friends:
             flash('Этот пользователь уже в ваших друзьях', 'danger')
         else:
             try:
                 new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+                db_sess.add(new_friendship)
+                new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
                 db_sess.add(new_friendship)
                 db_sess.commit()
                 flash('Пользователь добавлен в друзья!', 'success')
@@ -554,8 +551,6 @@ def delete_friend(friend_id):
         for i in friend:
             if i.user_id == current_user.id and i.friend_id == friend_id:
                 friend_delete = i
-            elif i.user_id == friend_id and i.friend_id == current_user.id:
-                friend_delete = i
         if friend_delete != None:
             db_sess.delete(friend_delete)
             flash('Друг успешно удален!', 'success')
@@ -571,7 +566,7 @@ def delete_friend(friend_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new3.db")
+    db_session.global_init("db/new4.db")
     app.run()
 
 
