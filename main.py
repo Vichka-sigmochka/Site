@@ -11,6 +11,7 @@ import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import func
+
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
@@ -365,7 +366,7 @@ def search_results():
         (func.lower(User.name).startswith(query)) |
         (func.lower(User.surname).startswith(query)) |
         (func.lower(User.specialization).startswith(query)) |
-        (func.lower(User.town).startswith(query))
+        (func.lower(User.city).startswith(query))
     ).all()
     return render_template('search_results.html', users=users, query=query)
 
@@ -551,7 +552,7 @@ def delete_friend():
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new2.db")
+    db_session.global_init("db/new3.db")
     app.run()
 
 
