@@ -1,88 +1,107 @@
-/* Blog Page Specific Styles */
-.navbar {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* Основной стиль для страницы */
+body {
+  background-color: #f0f8ff; /* Легкий голубой фон */
+  font-family: 'Arial', sans-serif;
+  color: #333;
 }
 
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 10px;
-    overflow: hidden;
+/* Шапка */
+.main-header {
+  background-color: #007bff; /* Яркий голубой */
+  border-bottom: 5px solid #0056b3; /* Нижняя граница для контраста */
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+.main-header h1 {
+  font-size: 3rem;
+  font-weight: bold;
 }
 
-.card-img-container {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-    background-color: #f8f9fa;
+.main-header .lead {
+  font-size: 1.2rem;
+  margin-top: 10px;
 }
 
-.card-img-top {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
+/* Кнопки */
+.btn {
+  transition: all 0.3s ease;
 }
 
-.card:hover .card-img-top {
-    transform: scale(1.05);
+.btn:hover {
+  transform: scale(1.05); /* Легкое увеличение при наведении */
 }
 
-.card-title {
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.75rem;
+.btn-outline-light {
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
-.card-text {
-    font-size: 0.9rem;
-    color: #6c757d;
+.btn-outline-light:hover {
+  background-color: #ffffff;
+  color: #007bff;
 }
 
-.like-btn {
-    transition: all 0.3s ease;
+/* Карточки (features) */
+.feature-box {
+  background-color: #ffffff; /* Белый фон */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.like-btn:hover {
-    transform: scale(1.1);
+.feature-box:hover {
+  transform: translateY(-10px); /* Карточка двигается при наведении */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Увеличение тени */
 }
 
-.social-links a {
-    transition: all 0.3s ease;
+.feature-box .display-5 {
+  font-size: 3rem;
+  color: #007bff;
 }
 
-.social-links a:hover {
-    transform: translateY(-3px);
-    opacity: 0.8;
+/* Иконки */
+.feature-box i {
+  transition: transform 0.3s ease;
 }
 
-/* Pagination styles */
-.pagination .page-item.active .page-link {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+.feature-box:hover i {
+  transform: rotate(360deg); /* Иконка вращается при наведении */
 }
 
-.pagination .page-link {
-    color: var(--primary-color);
+/* Подвал */
+.footer {
+  background-color: #343a40;
+  color: white;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .card-img-container {
-        height: 180px;
-    }
+.footer small {
+  font-size: 0.9rem;
+  letter-spacing: 1px;
 }
 
+/* Анимации для загрузки */
+.main-header, .feature-box {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Мобильная адаптация */
 @media (max-width: 768px) {
-    .navbar-brand {
-        font-size: 1rem;
-    }
+  .main-header h1 {
+    font-size: 2rem;
+  }
 
-    .card-img-container {
-        height: 150px;
-    }
+  .btn-lg {
+    padding: 10px 20px;
+  }
+
+  .feature-box {
+    padding: 20px;
+  }
 }
