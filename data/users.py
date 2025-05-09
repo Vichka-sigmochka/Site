@@ -3,8 +3,8 @@ import sqlalchemy
 from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.orm import relationship
-#from datetime import datetime
+from sqlalchemy.orm import relationship, backref
+# from datetime import datetime
 from data import db_session
 
 
@@ -22,12 +22,14 @@ class User(SqlAlchemyBase, UserMixin):
     specialization = sqlalchemy.Column(sqlalchemy.String(100))
     town = sqlalchemy.Column(sqlalchemy.String(100))
     bio = sqlalchemy.Column(sqlalchemy.Text)
+    city = sqlalchemy.Column(sqlalchemy.Text)
     avatar = sqlalchemy.Column(sqlalchemy.String(100))
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     posts = relationship('Post', backref='author', lazy=True)
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
+    #friends = relationship('Friendship', backref='user', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -57,6 +59,7 @@ class Post(SqlAlchemyBase):
             return False
         return any(like.user_id == user.id for like in self.likes)
 
+
 class Project(SqlAlchemyBase):
     __tablename__ = 'project'
 
@@ -67,6 +70,7 @@ class Project(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
 
+
 class Like(SqlAlchemyBase):
     __tablename__ = 'like'
 
@@ -75,3 +79,10 @@ class Like(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'), nullable=False)
 
+
+class Friendship(SqlAlchemyBase):
+    __tablename__ = 'friendship'
+
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    friend_id = sqlalchemy.Column(sqlalchemy.Integer)
+    created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

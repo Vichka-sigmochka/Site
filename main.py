@@ -4,17 +4,15 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like
+from data.users import User, Post, Project, Like, Friendship
 import datetime
 import os
-from PIL import Image
 import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import func
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
-
 
 app = Flask(__name__)
 
@@ -38,14 +36,11 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(int(user_id))
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def resize_image(image_path, max_size=(800, 800)):
-    img = Image.open(image_path)
-    img.thumbnail(max_size)
-    img.save(image_path)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -56,6 +51,7 @@ def index():
             return redirect('/login')
         return redirect('/register')
     return render_template('index.html', title='Главная страница', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -81,6 +77,7 @@ def register():
         return redirect('/index')
     return render_template('register.html', title='Регистрация', form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -97,6 +94,7 @@ def login():
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
+
 
 @app.route('/logout')
 @login_required
@@ -118,7 +116,6 @@ def profile_edit():
         user.age = form.age.data
         user.specialization = form.specialization.data
         user.bio = form.bio.data
-
         if 'avatar' in request.files:
             file = request.files['avatar']
             if file and file.filename != '' and allowed_file(file.filename):
@@ -128,17 +125,15 @@ def profile_edit():
                         if os.path.exists(old_path):
                             os.remove(old_path)
                 except:
-                    print("No file")
-
+                    flash(f'Ошибка при сохранение файла')
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
-                unique_filename = f"{timestamp}_{filename}"
+                unique_filename = f"{timestamp}.{filename}"
                 try:
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                     user.avatar = unique_filename
                 except  Exception as e:
                     flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
-
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile_view'))
@@ -158,7 +153,7 @@ def home():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).options(
         db.joinedload(Post.author),
-              db.joinedload(Post.likes)
+        db.joinedload(Post.likes)
     ).order_by(Post.date_created.desc()).all()
     posts_data = []
     for post in posts:
@@ -181,11 +176,13 @@ def home():
                            current_user=current_user,
                            title='Домашняя страница')
 
+
 @app.route('/posts')
 def posts():
     db_sess = db_session.create_session()
     all_posts = db_sess.query(Post).order_by(Post.date_created.desc()).all()
     return render_template('posts.html', posts=all_posts)
+
 
 @app.route('/add_post', methods=['GET', 'POST'])
 @login_required
@@ -222,6 +219,7 @@ def add_post():
             return redirect(url_for('add_post'))
     return render_template('add_post.html')
 
+
 @app.route('/post/<int:post_id>')
 def post_detail(post_id):
     db_sess = db_session.create_session()
@@ -229,6 +227,7 @@ def post_detail(post_id):
     if not post:
         os.abort(404)
     return render_template('post_detail.html', post=post)
+
 
 @app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required
@@ -267,6 +266,7 @@ def edit_post(post_id):
             app.logger.error(f"Error editing post: {e}")
     return render_template('edit_post.html', post=post)
 
+
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post(post_id):
@@ -294,9 +294,22 @@ def delete_post(post_id):
         app.logger.error(f"Error deleting post: {e}")
     return redirect(url_for('posts'))
 
+
 @app.route('/friends')
 def friends():
-    return "friends"
+    db_sess = db_session.create_session()
+    friend = db_sess.query(Friendship).all()
+    friends = []
+    for i in friend:
+        if i.user_id == current_user.id:
+            user = db_sess.query(User).get(i.friend_id)
+            friends += [user.name]
+        elif i.friend_id == current_user.id:
+            user = db_sess.query(User).get(i.user_id)
+            friends += [user.name]
+    db_sess.commit()
+    return render_template('friends.html', friends=friends)
+
 
 @app.route('/profile_author_post/<int:user_id>', methods=['GET', 'POST'])
 @login_required
@@ -305,9 +318,11 @@ def profile_author_post(user_id):
     user = db_sess.query(User).get(user_id)
     return render_template('profile_author.html', user=user)
 
+
 @app.route('/find')
 def find():
     return render_template('search.html')
+
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -354,11 +369,13 @@ def search_results():
     ).all()
     return render_template('search_results.html', users=users, query=query)
 
+
 @app.route('/projects')
 def projects():
     db_sess = db_session.create_session()
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
+
 
 @app.route('/toggle_like/<int:post_id>', methods=['POST'])
 @login_required
@@ -386,6 +403,7 @@ def toggle_like(post_id):
         'likes_count': likes_count,
         'post_id': post_id
     })
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 @login_required
@@ -422,6 +440,7 @@ def add_project():
             return redirect(url_for('add_project'))
     return render_template('add_project.html')
 
+
 @app.route('/project/<int:project_id>')
 def project_detail(project_id):
     db_sess = db_session.create_session()
@@ -429,6 +448,7 @@ def project_detail(project_id):
     if not project:
         os.abort(404)
     return render_template('project_detail.html', project=project)
+
 
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
@@ -467,6 +487,7 @@ def edit_project(project_id):
             app.logger.error(f"Error editing project: {e}")
     return render_template('edit_project.html', project=project)
 
+
 @app.route('/delete_project/<int:project_id>', methods=['POST'])
 @login_required
 def delete_project(project_id):
@@ -494,11 +515,46 @@ def delete_project(project_id):
         app.logger.error(f"Error deleting project: {e}")
     return redirect(url_for('projects'))
 
+
+@app.route('/add_friend/<int:friend_id>')
+@login_required
+def add_friend(friend_id):
+    if current_user.id == friend_id:
+        flash('Вы не можете добавить себя в друзья', 'danger')
+    else:
+        db_sess = db_session.create_session()
+        friend = db_sess.query(Friendship).all()
+        friends = set()
+        for i in friend:
+            if i.user_id == current_user.id:
+                friends.add(i.friend_id)
+            elif i.friend_id == current_user.id:
+                friends.add(i.user_id)
+        if friend_id in friends:
+            flash('Этот пользователь уже в ваших друзьях', 'danger')
+        else:
+            try:
+                new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+                db_sess.add(new_friendship)
+                db_sess.commit()
+                flash('Пользователь добавлен в друзья!', 'success')
+            except:
+                flash(f'Ошибка при добавление пользователя в друзья', 'danger')
+    return redirect(url_for('home'))
+
+
+@app.route('/delete_friend')
+@login_required
+def delete_friend():
+    return 'delete'
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/olli2.db")
+    db_session.global_init("db/new2.db")
     app.run()
+
 
 if __name__ == '__main__':
     main()
-    #app.run(port=8080, host='127.0.0.1')
+    # app.run(port=8080, host='127.0.0.1')
