@@ -1,48 +1,63 @@
-{% extends "base.html" %}
-
-{% block content %}
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шапка сайта</title>
-    <style>
-        /* Стили для шапки */
-        .header {
-            background-color: #f0f0f0; /* Светло-серый фон */
-            padding: 10px 0; /* Отступы сверху и снизу */
-            text-align: center; /* Выравнивание ссылок по центру */
-            font-family: sans-serif; /* Шрифт */
-        }
-
-        .header a {
-            display: inline-block; /* Расположение ссылок в одну строку */
-            margin: 0 15px; /* Отступы между ссылками */
-            text-decoration: none; /* Убрать подчеркивание */
-            color: #333; /* Темно-серый цвет текста */
-            font-weight: bold; /* Жирный шрифт */
-        }
-
-        .header a:hover {
-            color: #007bff; /* Цвет текста при наведении */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Добро пожаловать</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <header class="header">
-        <form action="" method="post" novalidate>
-         {{ form.hidden_tag() }}
-         <a href="/people">Люди {{ form.submit_login(type="submit", class="btn btn-primary") }} {{ form.submit_registration(type="submit", class="btn btn-primary") }} </a>
-        </form>
-    </header>
+<!-- Шапка -->
+<header class="main-header text-white text-center py-5" style="background-color: #007bff;">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Добро пожаловать на сайт</h1>
+    <p class="lead">Ваше цифровое пространство для общения, поиска и вдохновения.</p>
+    <form action="" method="post" novalidate class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      {{ form.hidden_tag() }}
+      {{ form.submit_login(class="btn btn-outline-light btn-lg px-4") }}
+      {{ form.submit_registration(class="btn btn-light btn-lg px-4") }}
+    </form>
+  </div>
+</header>
 
-    <main>
-        <h1>Содержимое сайта</h1>
-        <p>Здесь будет располагаться основной контент вашего сайта.</p>
-    </main>
+<!-- Основной контент -->
+<main class="container my-5">
+  <div class="row text-center">
+    <div class="col-md-4 mb-4">
+      <div class="feature-box p-4 shadow-sm rounded-4 h-100">
+        <i class="bi bi-person-lines-fill display-5 text-primary mb-3"></i>
+        <h5 class="fw-bold">Профили пользователей</h5>
+        <p>Просматривайте анкеты, знакомьтесь и расширяйте круг общения.</p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-box p-4 shadow-sm rounded-4 h-100">
+        <i class="bi bi-chat-left-text-fill display-5 text-success mb-3"></i>
+        <h5 class="fw-bold">Общение</h5>
+        <p>Удобные инструменты для связи и обмена сообщениями.</p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-box p-4 shadow-sm rounded-4 h-100">
+        <i class="bi bi-stars display-5 text-warning mb-3"></i>
+        <h5 class="fw-bold">Вдохновение</h5>
+        <p>Читайте истории, делитесь идеями и находите мотивацию каждый день.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Подвал -->
+<footer class="footer text-center py-4 mt-auto bg-dark text-white">
+  <div class="container">
+    <small>&copy; 2025 Мой Сайт — все права защищены</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
-
-{% endblock %}

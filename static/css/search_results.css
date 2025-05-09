@@ -1,0 +1,245 @@
+:root {
+    --primary-color: #4285f4;
+    --primary-hover: #3367d6;
+    --text-color: #2d3748;
+    --light-gray: #f7fafc;
+    --border-color: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8fafc;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+/* Header styles */
+.site-header {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-items {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-items a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-items a:hover {
+    color: var(--primary-color);
+}
+
+/* Search results styles */
+.results-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.search-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.results-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.search-query {
+    font-size: 1.1rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.search-query span {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.results-count {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+/* Profiles grid */
+.profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: var(--light-gray);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.profile-photo-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow);
+}
+
+.online-status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.online-status.online {
+    background-color: #48bb78;
+}
+
+.online-status.offline {
+    background-color: #a0aec0;
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.profile-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: var(--text-color);
+}
+
+.profile-specialization {
+    font-size: 0.9rem;
+    color: #4a5568;
+    margin-bottom: 0.2rem;
+}
+
+.profile-location {
+    font-size: 0.8rem;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+/* No results styles */
+.no-results {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.no-results-image {
+    max-width: 300px;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+}
+
+.no-results h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.no-results p {
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+}
+
+.back-to-search {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.back-to-search:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .profiles-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .results-title {
+        font-size: 1.5rem;
+    }
+
+    .search-query {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profiles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-items {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+}

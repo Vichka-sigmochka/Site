@@ -1,0 +1,65 @@
+/* Общие настройки */
+body {
+  background: linear-gradient(to right, #e0f7fa, #e0f2f1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+/* Шапка */
+header {
+  background: #0288d1;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+  color: #ffd740;
+}
+
+/* Карточка профиля */
+.card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+/* Аватар */
+.current-avatar img {
+  border: 5px solid #4dd0e1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.current-avatar img:hover {
+  transform: scale(1.05);
+}
+
+/* Кнопки */
+.btn-primary {
+  background-color: #0288d1;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0277bd;
+}
+
+/* Отступы между секциями */
+main {
+  padding-bottom: 40px;
+}

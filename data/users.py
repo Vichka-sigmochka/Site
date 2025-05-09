@@ -35,8 +35,6 @@ class User(SqlAlchemyBase, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
-    def is_friend(self, user):
-        return self.friends.filter(Friendship.friend_id == user.id).count() > 0
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'

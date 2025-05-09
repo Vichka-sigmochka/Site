@@ -1,40 +1,61 @@
-{% extends "base_for_post.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои посты</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <nav class="navbar">
+      <div class="nav-items">
+        <a href="{{ url_for('home') }}">Главная</a>
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="{{ url_for('posts') }}">Моя жизнь</a>
+        <a href="{{ url_for('projects') }}">Мои проекты</a>
+        <a href="{{ url_for('friends') }}">Друзья</a>
+        <a href="{{ url_for('find') }}">🔎</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('logout') }}">Выйти</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Войти</a>
+          <a href="{{ url_for('register') }}">Регистрация</a>
+        {% endif %}
+      </div>
+    </nav>
+  </div>
+</header>
 
-{% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4">Мои посты</h1>
+<main class="container">
+    <h1>Мои посты</h1>
 
     {% if current_user.is_authenticated %}
-        <a href="{{ url_for('add_post') }}" class="btn btn-primary mb-4">Добавить пост</a>
+        <a href="{{ url_for('add_post') }}" class="add-post-button">Добавить пост</a>
     {% endif %}
 
-    <div class="row">
-    {% for post in posts %}
-        {% if current_user.is_authenticated and current_user == post.author %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+    <div class="posts-grid">
+        {% for post in posts %}
+            {% if current_user.is_authenticated and current_user == post.author %}
+            <div class="card">
                 {% if post.image %}
-                    <div class="card-img-container" style="height: 200px; overflow: hidden;">  <!-- Фиксированная высота контейнера -->
-                        <img
-                            src="{{ url_for('static', filename='uploads/' + post.image) }}"
-                            class="card-img-top img-fluid"
-                            alt="{{ post.title }}"
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                        >
+                    <div class="card-img-container">
+                        <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}">
                     </div>
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ post.title }}</h5>
-                    <p class="card-text">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
+                    <h5>{{ post.title }}</h5>
+                    <p>{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <a href="{{ url_for('post_detail', post_id=post.id) }}" class="btn btn-sm btn-outline-primary">Подробнее</a>
-                    <small class="text-muted float-end">{{ post.date_created.strftime('%d.%m.%Y') }}</small>
+                <div class="card-footer">
+                    <a href="{{ url_for('post_detail', post_id=post.id) }}" class="details-btn">Подробнее</a>
+                    <small class="date">{{ post.date_created.strftime('%d.%m.%Y') }}</small>
                 </div>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
         {% endfor %}
     </div>
-</div>
-{% endblock %}
+</main>
+</body>
+</html>

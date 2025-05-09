@@ -1,30 +1,60 @@
-{% extends "base_for_project.html" %}
-
-{% block content %}
-<div class="container mt-5">
-    <div class="card">
-        {% if project.image %}
-            <img src="{{ url_for('static', filename='uploads/' + project.image) }}" class="card-img-top" alt="{{ project.title }}">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ project.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/post_detail.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <nav class="navbar">
+      <div class="nav-items">
+        <a href="{{ url_for('home') }}">Главная</a>
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="{{ url_for('posts') }}">Моя жизнь</a>
+        <a href="{{ url_for('projects') }}">Мои проекты</a>
+        <a href="{{ url_for('friends') }}">Друзья</a>
+        <a href="{{ url_for('find') }}">🔎</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('logout') }}">Выйти</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Войти</a>
+          <a href="{{ url_for('register') }}">Регистрация</a>
         {% endif %}
-        <div class="card-body">
-            <h1 class="card-title">{{ project.title }}</h1>
-            <p class="card-text">{{ project.description }}</p>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+    <div class="post-card">
+        {% if project.image %}
+        <div class="post-img">
+            <img src="{{ url_for('static', filename='uploads/' + project.image) }}" alt="{{ project.title }}">
+        </div>
+        {% endif %}
+        <div class="post-body">
+            <h1>{{ project.title }}</h1>
+            <p>{{ project.description }}</p>
 
             {% if current_user.is_authenticated and current_user == project.author %}
-                <div class="btn-group mt-3">
-                    <a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn btn-warning">Редактировать</a>
-                    <form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" class="ms-2">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот проект?')">Удалить</button>
-                    </form>
-                </div>
+            <div class="btn-group">
+                <a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn edit-btn">✏️ Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить этот пост?')">
+                    <button type="submit" class="btn delete-btn">🗑️ Удалить</button>
+                </form>
+            </div>
             {% endif %}
         </div>
-        <div class="card-footer text-muted">
+        <div class="post-footer">
             Опубликовано: {{ project.date_created.strftime('%d.%m.%Y в %H:%M') }}
             {% if project.author %}
                 | Автор: {{ project.author.name }}
             {% endif %}
         </div>
     </div>
-</div>
-{% endblock %}
+</main>
+</body>
+</html>

@@ -8,10 +8,10 @@ from data.users import User, Post, Project, Like
 import datetime
 import os
 from PIL import Image
-from sqlalchemy import func
 import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
+from sqlalchemy import func
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
@@ -309,7 +309,6 @@ def profile_author_post(user_id):
 def find():
     return render_template('search.html')
 
-
 @app.route('/search', methods=['GET'])
 def search():
     db_sess = db_session.create_session()
@@ -353,14 +352,13 @@ def search_results():
         (func.lower(User.specialization).startswith(query)) |
         (func.lower(User.town).startswith(query))
     ).all()
-    return render_template('search_resalts.html', users=users, query=query)
+    return render_template('search_results.html', users=users, query=query)
 
 @app.route('/projects')
 def projects():
     db_sess = db_session.create_session()
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
-
 
 @app.route('/toggle_like/<int:post_id>', methods=['POST'])
 @login_required
@@ -498,7 +496,7 @@ def delete_project(project_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/olli4.db")
+    db_session.global_init("db/olli2.db")
     app.run()
 
 if __name__ == '__main__':
