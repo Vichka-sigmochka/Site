@@ -12,12 +12,15 @@
     <h2>Friends</h2>
     <ul>
         {% for friend in friends %}
-            <li>{{ friend }}</li>
+            <li>
+                <img src="{{ url_for('static', filename='images/' + friend[2]) }}" width="50">
+                {{ friend[0] }} {{ friend[1] }}
+                <a href="{{ url_for('delete_friend', friend_id=friend[3]) }}"> Удалить друга</a>
+            </li>
         {% else %}
             <li>У вас нет друзей</li>
         {% endfor %}
     </ul>
     <a href="{{ url_for('find') }}"> Добавить друга</a>
-    <a href="{{ url_for('delete_friend') }}"> Удалить друга</a>
 </body>
 </html>

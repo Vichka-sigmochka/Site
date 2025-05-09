@@ -304,10 +304,10 @@ def friends():
     for i in friend:
         if i.user_id == current_user.id:
             user = db_sess.query(User).get(i.friend_id)
-            friends += [user.name]
+            friends += [(user.name, user.surname, user.avatar, user.id)]
         elif i.friend_id == current_user.id:
             user = db_sess.query(User).get(i.user_id)
-            friends += [user.name]
+            friends += [(user.name, user.surname, user.avatar, user.id)]
     db_sess.commit()
     return render_template('friends.html', friends=friends)
 
@@ -544,10 +544,29 @@ def add_friend(friend_id):
     return redirect(url_for('home'))
 
 
-@app.route('/delete_friend')
+@app.route('/delete_friend/<int:friend_id>')
 @login_required
-def delete_friend():
-    return 'delete'
+def delete_friend(friend_id):
+    db_sess = db_session.create_session()
+    try:
+        friend = db_sess.query(Friendship).all()
+        friend_delete = None
+        for i in friend:
+            if i.user_id == current_user.id and i.friend_id == friend_id:
+                friend_delete = i
+            elif i.user_id == friend_id and i.friend_id == current_user.id:
+                friend_delete = i
+        if friend_delete != None:
+            db_sess.delete(friend_delete)
+            flash('Друг успешно удален!', 'success')
+        else:
+            flash('Вы не можете удалить этого пользователя из друзей!', 'danger')
+        db_sess.commit()
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при удалении друга: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting friend: {e}")
+    return redirect(url_for('friends'))
 
 
 def main():
