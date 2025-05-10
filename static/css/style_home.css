@@ -117,3 +117,17 @@ body {
   }
 }
 
+.add-post-button {
+    display: inline-block;
+    background-color: #3399ff;
+    color: white;
+    padding: 10px 20px;
+    margin-bottom: 30px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.add-post-button:hover {
+    background-color: #267acc;
+}

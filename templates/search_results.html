@@ -40,7 +40,7 @@
             {% if users %}
             <div class="profiles-grid">
                 {% for user in users %}
-                <a href="{{ url_for('profile_author', user_id=user.id) }}" class="profile-card">
+                <a href="{{ url_for('profile_author_post', user_id=user.id) }}" class="profile-card">
                     <div class="profile-photo-container">
                         <img src="{{ url_for('static', filename='uploads/' + user.avatar) if user.avatar else url_for('static', filename='images/default_avatar.png') }}"
                              alt="{{ user.name }} {{ user.surname }}"
@@ -61,7 +61,6 @@
             </div>
             {% else %}
             <div class="no-results">
-                <img src="{{ url_for('static', filename='images/no_results.svg') }}" alt="Ничего не найдено" class="no-results-image">
                 <h2>Ничего не найдено</h2>
                 <p>Попробуйте изменить параметры поиска</p>
                 <a href="{{ url_for('find') }}" class="back-to-search">Вернуться к поиску</a>

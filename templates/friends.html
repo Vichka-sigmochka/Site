@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<header class="header">
-        <a href="{{ url_for('profile_view') }}">ЛК</a>
-        <a href="/posts">Моя жизнь</a>
-        <a href="/projects">Проеты</a>
-        <a href="/logout">Выйти</a>
-        <a href="/friends">Друзья</a>
-        <a href="/find">Найти</a>
-</header>
+<head>
+    <meta charset="UTF-8">
+    <title>Friends</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css') }}">
+</head>
 <body>
-    <h2>Friends</h2>
-    <ul>
-        {% for friend in friends %}
-            <li>
-                <img src="{{ url_for('static', filename='images/' + friend[2]) }}" width="50">
-                {{ friend[0] }} {{ friend[1] }}
-                <a href="{{ url_for('delete_friend', friend_id=friend[3]) }}"> Удалить друга</a>
-            </li>
-        {% else %}
-            <li>У вас нет друзей</li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('find') }}"> Добавить друга</a>
+    <header class="header">
+        <nav class="nav">
+            <a href="{{ url_for('profile_view') }}">ЛК</a>
+            <a href="/posts">Моя жизнь</a>
+            <a href="/projects">Проекты</a>
+            <a href="/logout">Выйти</a>
+            <a href="/friends">Друзья</a>
+            <a href="/find">Найти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Друзья</h2>
+        <ul class="friend-list">
+            {% for friend in friends %}
+                <li class="friend-item">
+                    <img src="{{ url_for('static', filename='uploads/' + friend[2]) }}" width="50" alt="Фото друга">
+                    <span>{{ friend[0] }} {{ friend[1] }}</span>
+                    <a href="{{ url_for('delete_friend', friend_id=friend[3]) }}" class="delete-link">Удалить друга</a>
+                </li>
+            {% else %}
+                <li>У вас нет друзей</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('find') }}" class="add-friend-link">Добавить друга</a>
+    </main>
 </body>
 </html>
