@@ -178,6 +178,28 @@ def home():
                            title='Домашняя страница')
 
 
+@app.route('/home_project', methods=['GET', 'POST'])
+def home_project():
+    db_sess = db_session.create_session()
+    projects = db_sess.query(Project).options(
+        db.joinedload(Project.author)).order_by(Project.date_created.desc()).all()
+    projects_data = []
+    for project in projects:
+        project_data = {
+            'id': project.id,
+            'title': project.title,
+            'description': project.description,
+            'image': project.image,
+            'date_created': project.date_created,
+            'user_id': project.author.id if project.author else None,
+        }
+        projects_data.append(project_data)
+    return render_template('home_project.html',
+                           projects=projects_data,
+                           current_user=current_user,
+                           title='Домашняя страница')
+
+
 @app.route('/posts')
 def posts():
     db_sess = db_session.create_session()

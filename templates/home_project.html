@@ -39,38 +39,33 @@
     <main class="py-4">
       <a href="{{ url_for('home') }}"> Посты </a>
       <a href="{{ url_for('home_project') }}"> Проекты </a>
-      {% if posts %}
+      {% if projects %}
       <div class="row">
-        {% for post in posts %}
+        {% for project in projects %}
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm post-card">
-            {% if post.image %}
+            {% if project.image %}
             <div class="card-img-container">
-              <img src="{{ url_for('static', filename='uploads/' + post.image) }}"
+              <img src="{{ url_for('static', filename='uploads/' + project.image) }}"
                    class="card-img-top"
-                   alt="{{ post.title }}">
+                   alt="{{ project.title }}">
             </div>
             {% endif %}
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ post.title }}</h5>
-              <p class="card-text">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
+              <h5 class="card-title">{{ project.title }}</h5>
+              <p class="card-text">{{ project.description[:100] }}{% if project.description|length > 100 %}...{% endif %}</p>
             </div>
             <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
-              <span>📅 {{ post.date_created.strftime('%d.%m.%Y') }}</span>
-              <span>👤 <a href="{{ url_for('profile_author_post', user_id=post.user_id) }}" class="text-decoration-none">{{ post.name }}</a></span>
+              <span>📅 {{ project.date_created.strftime('%d.%m.%Y') }}</span>
+              <span>👤 <a href="{{ url_for('profile_author_post', user_id=project.user_id) }}" class="text-decoration-none">{{ project.name }}</a></span>
             </div>
-            <form action="{{ url_for('toggle_like', post_id=post.id) }}" method="POST" class="like-form">
-              <button type="submit" class="like-btn {% if post.is_liked %}liked{% endif %}">
-                ❤️ <span class="likes-count">{{ post.likes|length }}</span>
-              </button>
-            </form>
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
         <div class="text-center text-muted mt-5">
-          <h4>Пока нет ни одного поста 😢</h4>
+          <h4>Пока нет ни одного проекта 😢</h4>
         </div>
       {% endif %}
     </main>
