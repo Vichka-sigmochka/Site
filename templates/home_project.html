@@ -37,10 +37,11 @@
     {% endwith %}
 
     <main class="py-4">
-      <a href="{{ url_for('home') }}"> Посты </a>
-      <a href="{{ url_for('home_project') }}"> Проекты </a>
+      <a href="{{ url_for('home') }}" class="button"> Посты </a>
+      <a href="{{ url_for('home_project') }}" class="button"> Проекты </a>
       {% if projects %}
       <div class="row">
+        <a> Все проекты </a>
         {% for project in projects %}
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm post-card">
