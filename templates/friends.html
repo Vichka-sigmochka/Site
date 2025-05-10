@@ -1,34 +1,26 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Друзья</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css') }}">
-</head>
-<body>
+<html lang="en">
 <header class="header">
-    <a href="{{ url_for('profile_view') }}">ЛК</a>
-    <a href="/posts">Моя жизнь</a>
-    <a href="/projects">Проекты</a>
-    <a href="/logout">Выйти</a>
-    <a href="/friends">Друзья</a>
-    <a href="/find">Найти</a>
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проеты</a>
+        <a href="/logout">Выйти</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
 </header>
-
-<div class="container">
-    <h2>Мои друзья</h2>
-    <ul class="friend-list">
+<body>
+    <h2>Friends</h2>
+    <ul>
         {% for friend in friends %}
-            <li>{{ friend }}</li>
+            <li>
+                <img src="{{ url_for('static', filename='images/' + friend[2]) }}" width="50">
+                {{ friend[0] }} {{ friend[1] }}
+                <a href="{{ url_for('delete_friend', friend_id=friend[3]) }}"> Удалить друга</a>
+            </li>
         {% else %}
-            <li class="no-friends">У вас нет друзей</li>
+            <li>У вас нет друзей</li>
         {% endfor %}
     </ul>
-
-    <div class="actions">
-        <a href="{{ url_for('find') }}" class="action-btn">Добавить друга</a>
-        <a href="{{ url_for('delete_friend') }}" class="action-btn delete">Удалить друга</a>
-    </div>
-</div>
+    <a href="{{ url_for('find') }}"> Добавить друга</a>
 </body>
 </html>

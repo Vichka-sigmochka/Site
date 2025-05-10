@@ -11,6 +11,7 @@ import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import func
+
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
 
@@ -177,6 +178,28 @@ def home():
                            title='Домашняя страница')
 
 
+@app.route('/home_project', methods=['GET', 'POST'])
+def home_project():
+    db_sess = db_session.create_session()
+    projects = db_sess.query(Project).options(
+        db.joinedload(Project.author)).order_by(Project.date_created.desc()).all()
+    projects_data = []
+    for project in projects:
+        project_data = {
+            'id': project.id,
+            'title': project.title,
+            'description': project.description,
+            'image': project.image,
+            'date_created': project.date_created,
+            'user_id': project.author.id if project.author else None,
+        }
+        projects_data.append(project_data)
+    return render_template('home_project.html',
+                           projects=projects_data,
+                           current_user=current_user,
+                           title='Домашняя страница')
+
+
 @app.route('/posts')
 def posts():
     db_sess = db_session.create_session()
@@ -303,10 +326,7 @@ def friends():
     for i in friend:
         if i.user_id == current_user.id:
             user = db_sess.query(User).get(i.friend_id)
-            friends += [user.name]
-        elif i.friend_id == current_user.id:
-            user = db_sess.query(User).get(i.user_id)
-            friends += [user.name]
+            friends += [(user.name, user.surname, user.avatar, user.id)]
     db_sess.commit()
     return render_template('friends.html', friends=friends)
 
@@ -365,7 +385,7 @@ def search_results():
         (func.lower(User.name).startswith(query)) |
         (func.lower(User.surname).startswith(query)) |
         (func.lower(User.specialization).startswith(query)) |
-        (func.lower(User.town).startswith(query))
+        (func.lower(User.city).startswith(query))
     ).all()
     return render_template('search_results.html', users=users, query=query)
 
@@ -528,13 +548,13 @@ def add_friend(friend_id):
         for i in friend:
             if i.user_id == current_user.id:
                 friends.add(i.friend_id)
-            elif i.friend_id == current_user.id:
-                friends.add(i.user_id)
         if friend_id in friends:
             flash('Этот пользователь уже в ваших друзьях', 'danger')
         else:
             try:
                 new_friendship = Friendship(user_id=current_user.id, friend_id=friend_id)
+                db_sess.add(new_friendship)
+                new_friendship = Friendship(user_id=friend_id, friend_id=current_user.id)
                 db_sess.add(new_friendship)
                 db_sess.commit()
                 flash('Пользователь добавлен в друзья!', 'success')
@@ -543,15 +563,32 @@ def add_friend(friend_id):
     return redirect(url_for('home'))
 
 
-@app.route('/delete_friend')
+@app.route('/delete_friend/<int:friend_id>')
 @login_required
-def delete_friend():
-    return 'delete'
+def delete_friend(friend_id):
+    db_sess = db_session.create_session()
+    try:
+        friend = db_sess.query(Friendship).all()
+        friend_delete = None
+        for i in friend:
+            if i.user_id == current_user.id and i.friend_id == friend_id:
+                friend_delete = i
+        if friend_delete != None:
+            db_sess.delete(friend_delete)
+            flash('Друг успешно удален!', 'success')
+        else:
+            flash('Вы не можете удалить этого пользователя из друзей!', 'danger')
+        db_sess.commit()
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при удалении друга: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting friend: {e}")
+    return redirect(url_for('friends'))
 
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/olli5.db")
+    db_session.global_init("db/new4.db")
     app.run()
 
 

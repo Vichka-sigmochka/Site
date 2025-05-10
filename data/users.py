@@ -20,7 +20,6 @@ class User(SqlAlchemyBase, UserMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     age = sqlalchemy.Column(sqlalchemy.Integer)
     specialization = sqlalchemy.Column(sqlalchemy.String(100))
-    town = sqlalchemy.Column(sqlalchemy.String(100))
     bio = sqlalchemy.Column(sqlalchemy.Text)
     city = sqlalchemy.Column(sqlalchemy.Text)
     avatar = sqlalchemy.Column(sqlalchemy.String(100))
@@ -29,7 +28,6 @@ class User(SqlAlchemyBase, UserMixin):
     posts = relationship('Post', backref='author', lazy=True)
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
-    #friends = relationship('Friendship', backref='user', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -83,6 +81,7 @@ class Like(SqlAlchemyBase):
 class Friendship(SqlAlchemyBase):
     __tablename__ = 'friendship'
 
-    user_id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer)
     friend_id = sqlalchemy.Column(sqlalchemy.Integer)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
