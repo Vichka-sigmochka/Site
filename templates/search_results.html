@@ -40,7 +40,7 @@
             {% if users %}
             <div class="profiles-grid">
                 {% for user in users %}
-                <a href="{{ url_for('profile_view', user_id=user.id) }}" class="profile-card">
+                <a href="{{ url_for('profile_author', user_id=user.id) }}" class="profile-card">
                     <div class="profile-photo-container">
                         <img src="{{ url_for('static', filename='uploads/' + user.avatar) if user.avatar else url_for('static', filename='images/default_avatar.png') }}"
                              alt="{{ user.name }} {{ user.surname }}"

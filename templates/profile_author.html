@@ -1,48 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-<style>
-        /* Стили для шапки */
-        .header {
-            background-color: #f0f0f0; /* Светло-серый фон */
-            padding: 10px 0; /* Отступы сверху и снизу */
-            text-align: center; /* Выравнивание ссылок по центру */
-            font-family: sans-serif; /* Шрифт */
-        }
-
-        .header a {
-            display: inline-block; /* Расположение ссылок в одну строку */
-            margin: 0 15px; /* Отступы между ссылками */
-            text-decoration: none; /* Убрать подчеркивание */
-            color: #333; /* Темно-серый цвет текста */
-            font-weight: bold; /* Жирный шрифт */
-        }
-
-        .header a:hover {
-            color: #007bff; /* Цвет текста при наведении */
-        }
-</style>
-<header class="header">
-        <a href="{{ url_for('profile_view') }}">ЛК</a>
-        <a href="/posts">Моя жизнь</a>
-        <a href="/projects">Проеты</a>
-        <a href="/logout">Выйти</a>
-        <a href="/friends">Друзья</a>
-        <a href="/find">Найти</a>
-</header>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Об авторе</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_author.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 <body>
-    <h1>Об авторе поста</h1>
-    <p>Имя: {{ user.name }}</p>
-    <p>Фамилия: {{ user.surname }}</p>
-    <p>Почта: {{ user.email }}</p>
-    <p>Возраст: {{ user.age }} лет</p>
-    <p>Должность: {{ user.specialization }}</p>
-    <p>Описание: {{ user.bio }}</p>
-    <p>Город проживания: {{ user.city }}</p>
-        <div class="current-avatar">
-            <p>Текущий аватар:</p>
-            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
-                 alt="Аватар" class="img-thumbnail" width="150">
+    <header class="header">
+        <nav>
+            <a href="{{ url_for('profile_view') }}">ЛК</a>
+            <a href="/posts">Моя жизнь</a>
+            <a href="/projects">Проекты</a>
+            <a href="/friends">Друзья</a>
+            <a href="/find">Найти</a>
+            <a href="/logout">Выйти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Об авторе поста</h1>
+        <div class="user-info">
+            <p><strong>Имя:</strong> {{ user.name }}</p>
+            <p><strong>Фамилия:</strong> {{ user.surname }}</p>
+            <p><strong>Почта:</strong> {{ user.email }}</p>
+            <p><strong>Возраст:</strong> {{ user.age }} лет</p>
+            <p><strong>Должность:</strong> {{ user.specialization }}</p>
+            <p><strong>Описание:</strong> {{ user.bio }}</p>
+            <p><strong>Город проживания:</strong> {{ user.city }}</p>
         </div>
-    <a href="{{ url_for('add_friend', friend_id=user.id) }}">Добавить в друзья</a>
+
+        <div class="avatar-section">
+            <p><strong>Текущий аватар:</strong></p>
+            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+                 alt="Аватар" class="avatar-img">
+        </div>
+
+        <a href="{{ url_for('add_friend', friend_id=user.id) }}" class="friend-btn">Добавить в друзья</a>
+    </main>
 </body>
 </html>
