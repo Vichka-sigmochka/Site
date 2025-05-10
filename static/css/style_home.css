@@ -131,3 +131,17 @@ body {
 .add-post-button:hover {
     background-color: #267acc;
 }
+
+.details-btn-review {
+    text-decoration: none;
+    color: #3399ff;
+    border: 1px solid #3399ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.details-btn-review:hover {
+    background-color: #3399ff;
+    color: white;
+}

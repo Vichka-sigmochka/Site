@@ -28,6 +28,7 @@ class User(SqlAlchemyBase, UserMixin):
     posts = relationship('Post', backref='author', lazy=True)
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
+    reviews = relationship('Review', backref='author', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -68,6 +69,8 @@ class Project(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
 
+    reviews = relationship('Review', backref='project', lazy=True)
+
 
 class Like(SqlAlchemyBase):
     __tablename__ = 'like'
@@ -85,3 +88,12 @@ class Friendship(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer)
     friend_id = sqlalchemy.Column(sqlalchemy.Integer)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+
+class Review(SqlAlchemyBase):
+    __tablename__ = 'review'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
+    date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
+    project_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('project.id'), nullable=False)

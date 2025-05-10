@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship
+from data.users import User, Post, Project, Like, Friendship, Review
 import datetime
 import os
 import warnings
@@ -317,6 +317,96 @@ def delete_post(post_id):
         app.logger.error(f"Error deleting post: {e}")
     return redirect(url_for('posts'))
 
+@app.route('/reviews/<int:project_id>', methods=['GET', 'POST'])
+def reviews(project_id):
+    db_sess = db_session.create_session()
+    all_reviews = db_sess.query(Review).order_by(Review.date_created.desc()).all()
+    return render_template('reviews.html', reviews=all_reviews, project_id=project_id)
+
+
+@app.route('/add_review/<int:project_id>', methods=['GET', 'POST'])
+@login_required
+def add_review(project_id):
+    if request.method == 'POST':
+        db_sess = db_session.create_session()
+        try:
+            if not request.form.get('description'):
+                flash('Заполните все обязательные поля', 'danger')
+                return redirect(url_for('add_review'))
+            user = db_sess.query(User).get(current_user.id)
+            project = db_sess.query(Project).get(project_id)
+            new_review = Review(
+                description=request.form['description'],
+                author=user,
+                project=project
+            )
+            db_sess.add(new_review)
+            db_sess.commit()
+            flash('Отзыв успешно добавлен!', 'success')
+            return redirect(url_for('reviews', project_id=project_id))
+        except Exception as e:
+            db_sess.rollback()
+            flash(f'Ошибка при сохранении отзыва: {str(e)}', 'danger')
+            return redirect(url_for('add_review', project_id=project_id))
+    return render_template('add_review.html', project_id=project_id)
+
+
+@app.route('/review/<int:project_id>/<int:review_id>')
+def review_detail(project_id, review_id):
+    db_sess = db_session.create_session()
+    review = db_sess.query(Review).get(review_id)
+    if not review:
+        os.abort(404)
+    return render_template('review_detail.html',project_id=project_id, review=review)
+
+
+@app.route('/edit_review/<int:project_id>/<int:review_id>', methods=['GET', 'POST'])
+@login_required
+def edit_review(project_id, review_id):
+    db_sess = db_session.create_session()
+    review = db_sess.query(Review).get(review_id)
+    user = db_sess.query(User).get(current_user.id)
+    if not review:
+        flash('Отзыв не найден', 'danger')
+        return redirect(url_for('reviews'))
+    if review.author != user:
+        flash('Вы не можете редактировать этот отзыв', 'danger')
+        return redirect(url_for('reviews', project_id=project_id))
+    if request.method == 'POST':
+        try:
+            review.description = request.form['description']
+            db_sess.commit()
+            flash('Отзыв успешно обновлен!', 'success')
+            return redirect(url_for('review_detail', project_id=project_id, review_id=review.id))
+        except Exception as e:
+            db_sess.rollback()
+            flash(f'Ошибка при обновлении отзыва: {str(e)}', 'danger')
+            app.logger.error(f"Error editing review: {e}")
+    return render_template('edit_review.html', project_id=project_id, review=review)
+
+
+@app.route('/delete_review/<int:project_id>/<int:review_id>', methods=['POST'])
+@login_required
+def delete_review(project_id, review_id):
+    db_sess = db_session.create_session()
+    try:
+        review = db_sess.query(Review).get(review_id)
+        user = db_sess.query(User).get(current_user.id)
+        if not review:
+            flash('Отзыв не найден', 'danger')
+            return redirect(url_for('reviews'))
+        if review.author != user:
+            flash('Вы не можете удалить этот отзыв', 'danger')
+            return redirect(url_for('reviews'))
+        db_sess.delete(review)
+        db_sess.commit()
+        flash('Отзыв успешно удален!', 'success')
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при удалении отзыва: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting review: {e}")
+    return redirect(url_for('reviews', project_id=project_id))
+
 
 @app.route('/friends')
 def friends():
@@ -588,7 +678,7 @@ def delete_friend(friend_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new4.db")
+    db_session.global_init("db/new5.db")
     app.run()
 
 
