@@ -187,7 +187,8 @@ def home_project():
             'description': project.description,
             'image': project.image,
             'date_created': project.date_created,
-            'user_id': project.author.id if project.author else None,
+            'name': project.author.name if project.author else 'Неизвестный автор',
+            'user_id': project.author.id if project.author else None
         }
         projects_data.append(project_data)
     return render_template('home_project.html',
