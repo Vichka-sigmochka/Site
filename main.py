@@ -675,7 +675,7 @@ def delete_friend(friend_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new5.db")
+    db_session.global_init("db/new2.db")
     app.run()
 
 
