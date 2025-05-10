@@ -7,36 +7,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <header class="header">
-        <nav>
-            <a href="{{ url_for('profile_view') }}">ЛК</a>
-            <a href="/posts">Моя жизнь</a>
-            <a href="/projects">Проекты</a>
-            <a href="/friends">Друзья</a>
-            <a href="/find">Найти</a>
-            <a href="/logout">Выйти</a>
-        </nav>
-    </header>
+<header class="header">
+    <nav>
+        <a href="{{ url_for('profile_view') }}">ЛК</a>
+        <a href="/posts">Моя жизнь</a>
+        <a href="/projects">Проекты</a>
+        <a href="/friends">Друзья</a>
+        <a href="/find">Найти</a>
+        <a href="/logout">Выйти</a>
+    </nav>
+</header>
 
-    <main class="container">
-        <h1>Об авторе поста</h1>
-        <div class="user-info">
-            <p><strong>Имя:</strong> {{ user.name }}</p>
-            <p><strong>Фамилия:</strong> {{ user.surname }}</p>
-            <p><strong>Почта:</strong> {{ user.email }}</p>
-            <p><strong>Возраст:</strong> {{ user.age }} лет</p>
-            <p><strong>Должность:</strong> {{ user.specialization }}</p>
-            <p><strong>Описание:</strong> {{ user.bio }}</p>
-            <p><strong>Город проживания:</strong> {{ user.city }}</p>
-        </div>
+<main class="container">
+    <h1>Об авторе поста</h1>
+    <div class="user-info">
+        <p><strong>Имя:</strong> {{ user.name }}</p>
+        <p><strong>Фамилия:</strong> {{ user.surname }}</p>
+        <p><strong>Почта:</strong> {{ user.email }}</p>
+        <p><strong>Возраст:</strong> {{ user.age }} лет</p>
+        <p><strong>Должность:</strong> {{ user.specialization }}</p>
+        <p><strong>Описание:</strong> {{ user.bio }}</p>
+        <p><strong>Город проживания:</strong> {{ user.city }}</p>
+    </div>
 
-        <div class="avatar-section">
-            <p><strong>Текущий аватар:</strong></p>
-            <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
-                 alt="Аватар" class="avatar-img">
-        </div>
+    <div class="avatar-section">
+        <p><strong>Текущий аватар:</strong></p>
+        <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}"
+             alt="Аватар" class="avatar-img">
+    </div>
 
-        <a href="{{ url_for('add_friend', friend_id=user.id) }}" class="friend-btn">Добавить в друзья</a>
-    </main>
+    <a href="{{ url_for('add_friend', friend_id=user.id) }}" class="friend-btn">Добавить в друзья</a>
+</main>
 </body>
 </html>

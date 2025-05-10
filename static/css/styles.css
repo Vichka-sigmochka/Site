@@ -1,12 +1,11 @@
-/* Основной стиль для страницы */
 body {
-  background-color: #f0f8ff; /* Нежный голубой фон */
+  background-color: #f0f8ff;
   font-family: 'Arial', sans-serif;
   color: #333;
 }
 
 .navbar {
-  background-color: #007bff; /* Основной голубой цвет для навигации */
+  background-color: #007bff;
 }
 
 .navbar-nav .nav-link {
@@ -17,11 +16,10 @@ body {
   color: #f8f9fa !important;
 }
 
-/* Карточки */
 .post-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: #ffffff; /* Белый фон карточки */
-  border: 1px solid #e0e0e0; /* Легкая граница */
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
 }
 
@@ -30,7 +28,6 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Изображения в карточках */
 .card-img-container {
   height: 220px;
   overflow: hidden;
@@ -44,7 +41,6 @@ body {
   object-fit: cover;
 }
 
-/* Кнопка лайка */
 .like-btn {
   background: none;
   border: none;
@@ -68,7 +64,6 @@ body {
   outline: none;
 }
 
-/* Footer (нижний колонтитул карточки) */
 .card-footer {
   background-color: #f8f9fa;
   font-size: 0.9rem;

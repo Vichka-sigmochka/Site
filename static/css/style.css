@@ -1,14 +1,12 @@
-/* Основной стиль для страницы */
 body {
-  background-color: #f0f8ff; /* Легкий голубой фон */
+  background-color: #f0f8ff;
   font-family: 'Arial', sans-serif;
   color: #333;
 }
 
-/* Шапка */
 .main-header {
-  background-color: #007bff; /* Яркий голубой */
-  border-bottom: 5px solid #0056b3; /* Нижняя граница для контраста */
+  background-color: #007bff;
+  border-bottom: 5px solid #0056b3;
 }
 
 .main-header h1 {
@@ -21,13 +19,12 @@ body {
   margin-top: 10px;
 }
 
-/* Кнопки */
 .btn {
   transition: all 0.3s ease;
 }
 
 .btn:hover {
-  transform: scale(1.05); /* Легкое увеличение при наведении */
+  transform: scale(1.05);
 }
 
 .btn-outline-light {
@@ -40,16 +37,15 @@ body {
   color: #007bff;
 }
 
-/* Карточки (features) */
 .feature-box {
-  background-color: #ffffff; /* Белый фон */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature-box:hover {
-  transform: translateY(-10px); /* Карточка двигается при наведении */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Увеличение тени */
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 .feature-box .display-5 {
@@ -57,16 +53,14 @@ body {
   color: #007bff;
 }
 
-/* Иконки */
 .feature-box i {
   transition: transform 0.3s ease;
 }
 
 .feature-box:hover i {
-  transform: rotate(360deg); /* Иконка вращается при наведении */
+  transform: rotate(360deg);
 }
 
-/* Подвал */
 .footer {
   background-color: #343a40;
   color: white;
@@ -77,7 +71,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Анимации для загрузки */
 .main-header, .feature-box {
   animation: fadeIn 1s ease-in-out;
 }
@@ -91,7 +84,6 @@ body {
   }
 }
 
-/* Мобильная адаптация */
 @media (max-width: 768px) {
   .main-header h1 {
     font-size: 2rem;

@@ -8,65 +8,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <nav class="navbar">
-                <div class="nav-items">
-                    <a href="{{ url_for('home') }}">Главная</a>
-                    <a href="{{ url_for('profile_view') }}">ЛК</a>
-                    <a href="{{ url_for('posts') }}">Моя жизнь</a>
-                    <a href="{{ url_for('projects') }}">Мои проекты</a>
-                    <a href="{{ url_for('friends') }}">Друзья</a>
-                    <a href="{{ url_for('find') }}">🔎</a>
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('logout') }}">Выйти</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">Войти</a>
-                        <a href="{{ url_for('register') }}">Регистрация</a>
+<header class="site-header">
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-items">
+                <a href="{{ url_for('home') }}">Главная</a>
+                <a href="{{ url_for('profile_view') }}">ЛК</a>
+                <a href="{{ url_for('posts') }}">Моя жизнь</a>
+                <a href="{{ url_for('projects') }}">Мои проекты</a>
+                <a href="{{ url_for('friends') }}">Друзья</a>
+                <a href="{{ url_for('find') }}">🔎</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}">Выйти</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">Войти</a>
+                <a href="{{ url_for('register') }}">Регистрация</a>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <div class="results-container">
+        <div class="search-header">
+            <h1 class="results-title">Результаты поиска</h1>
+            <p class="search-query">По запросу: <span>"{{ query }}"</span></p>
+            <p class="results-count">{{ users|length }} результатов</p>
+        </div>
+
+        {% if users %}
+        <div class="profiles-grid">
+            {% for user in users %}
+            <a href="{{ url_for('profile_author_post', user_id=user.id) }}" class="profile-card">
+                <div class="profile-photo-container">
+                    <img src="{{ url_for('static', filename='uploads/' + user.avatar) if user.avatar else url_for('static', filename='images/default_avatar.png') }}"
+                         alt="{{ user.name }} {{ user.surname }}"
+                         class="profile-photo">
+                    <div class="online-status {% if user.is_online %}online{% else %}offline{% endif %}"></div>
+                </div>
+                <div class="profile-info">
+                    <h3 class="profile-name">{{ user.name }} {{ user.surname }}</h3>
+                    {% if user.specialization %}
+                    <p class="profile-specialization">{{ user.specialization }}</p>
+                    {% endif %}
+                    {% if user.city %}
+                    <p class="profile-location">{{ user.city }}</p>
                     {% endif %}
                 </div>
-            </nav>
+            </a>
+            {% endfor %}
         </div>
-    </header>
-
-    <main class="container">
-        <div class="results-container">
-            <div class="search-header">
-                <h1 class="results-title">Результаты поиска</h1>
-                <p class="search-query">По запросу: <span>"{{ query }}"</span></p>
-                <p class="results-count">{{ users|length }} результатов</p>
-            </div>
-
-            {% if users %}
-            <div class="profiles-grid">
-                {% for user in users %}
-                <a href="{{ url_for('profile_author_post', user_id=user.id) }}" class="profile-card">
-                    <div class="profile-photo-container">
-                        <img src="{{ url_for('static', filename='uploads/' + user.avatar) if user.avatar else url_for('static', filename='images/default_avatar.png') }}"
-                             alt="{{ user.name }} {{ user.surname }}"
-                             class="profile-photo">
-                        <div class="online-status {% if user.is_online %}online{% else %}offline{% endif %}"></div>
-                    </div>
-                    <div class="profile-info">
-                        <h3 class="profile-name">{{ user.name }} {{ user.surname }}</h3>
-                        {% if user.specialization %}
-                        <p class="profile-specialization">{{ user.specialization }}</p>
-                        {% endif %}
-                        {% if user.city %}
-                        <p class="profile-location">{{ user.city }}</p>
-                        {% endif %}
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-results">
-                <h2>Ничего не найдено</h2>
-                <p>Попробуйте изменить параметры поиска</p>
-                <a href="{{ url_for('find') }}" class="back-to-search">Вернуться к поиску</a>
-            </div>
-            {% endif %}
+        {% else %}
+        <div class="no-results">
+            <h2>Ничего не найдено</h2>
+            <p>Попробуйте изменить параметры поиска</p>
+            <a href="{{ url_for('find') }}" class="back-to-search">Вернуться к поиску</a>
         </div>
-    </main>
+        {% endif %}
+    </div>
+</main>
 </body>
 </html>

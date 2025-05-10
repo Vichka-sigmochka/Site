@@ -91,7 +91,6 @@ body {
     vertical-align: middle;
 }
 
-/* Стилизация datalist (работает не во всех браузерах) */
 datalist {
     position: absolute;
     background-color: white;
