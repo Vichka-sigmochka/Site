@@ -87,9 +87,6 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            if not user.avatar:
-                user.avatar = '1.jpg'
-                db_sess.commit()
             return redirect("/home")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
@@ -138,7 +135,6 @@ def profile_edit():
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile_view'))
-
     return render_template('profile_edit.html', form=form)
 
 
@@ -588,7 +584,7 @@ def delete_friend(friend_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new4.db")
+    db_session.global_init("db/new1.db")
     app.run()
 
 

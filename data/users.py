@@ -18,11 +18,11 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    age = sqlalchemy.Column(sqlalchemy.Integer)
-    specialization = sqlalchemy.Column(sqlalchemy.String(100))
-    bio = sqlalchemy.Column(sqlalchemy.Text)
-    city = sqlalchemy.Column(sqlalchemy.Text)
-    avatar = sqlalchemy.Column(sqlalchemy.String(100))
+    age = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    specialization = sqlalchemy.Column(sqlalchemy.String(100), default='')
+    bio = sqlalchemy.Column(sqlalchemy.Text, default='')
+    city = sqlalchemy.Column(sqlalchemy.Text, default='')
+    avatar = sqlalchemy.Column(sqlalchemy.String(100), default='1.jpg')
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     posts = relationship('Post', backref='author', lazy=True)

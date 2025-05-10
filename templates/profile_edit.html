@@ -63,6 +63,9 @@
                     <div class="form-group mb-3">
                         {{ form.age.label(class="form-label") }}
                         {{ form.age(class="form-control") }}
+                        {% for error in form.age.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
                     </div>
 
                     <div class="form-group mb-3">
