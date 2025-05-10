@@ -65,6 +65,7 @@
                         <button type="submit" class="like-btn {% if post.is_liked %}liked{% endif %}">
                             ❤️ <span class="likes-count">{{ post.likes|length }}</span>
                         </button>
+                        <a href="{{ url_for('post_detail', post_id=post.id) }}" class="details-btn">Подробнее</a>
                     </form>
                 </div>
             </div>

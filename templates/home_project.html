@@ -62,6 +62,7 @@
                                    class="text-decoration-none">{{ project.name }}</a></span>
                     </div>
                     <div class="card-footer">
+                        <a href="{{ url_for('project_detail', project_id=project.id) }}" class="details-btn">Подробнее</a>
                         <a href="{{ url_for('reviews', project_id=project.id) }}" class="details-btn-review">Отзывы</a>
                     </div>
                 </div>
