@@ -341,7 +341,8 @@ def delete_post(post_id):
 def reviews(project_id):
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
-    all_reviews = db_sess.query(Review).filter(Review.project_id == project_id).order_by(Review.project_id.desc()).all()
+    all_reviews = (db_sess.query(Review).filter(
+        Review.project_id == project_id).order_by(Review.project_id.desc()).all())
     return render_template('reviews.html', reviews=all_reviews, project_id=project_id, project=project)
 
 
@@ -469,7 +470,7 @@ def search():
                 user = db_sess.query(User).get(i)
                 data.append((user.name, user.surname))
                 data.append((user.specialization))
-                data.append(user.town)
+                data.append(user.city)
                 i += 1
         except:
             ans = []
@@ -483,7 +484,7 @@ def search():
         (func.lower(User.name).startswith(query)) |
         (func.lower(User.surname).startswith(query)) |
         (func.lower(User.specialization).startswith(query)) |
-        (func.lower(User.town).startswith(query))
+        (func.lower(User.city).startswith(query))
     ).all()
     return render_template('search_results.html', users=users, query=query)
 
@@ -740,7 +741,7 @@ def add_favorite(post_id):
             flash('Этот пост уже в ваших избранных', 'danger')
         else:
             new_favorite = Favorite(
-                user_id = current_user.id,
+                user_id=current_user.id,
                 post_id=post_id
             )
             db_sess.add(new_favorite)
