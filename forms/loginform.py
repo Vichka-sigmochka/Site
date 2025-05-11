@@ -5,6 +5,9 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
 class LoginForm(FlaskForm):
+    """
+    LoginForm : форма для авторизации
+    """
     email = EmailField('Почта/Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
@@ -30,7 +33,6 @@ class ProfileForm(FlaskForm):
     bio = TextAreaField('О себе')
     avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')
-
 
     def validate_avatar(self, field):
         if field.data:

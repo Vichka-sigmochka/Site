@@ -38,7 +38,8 @@ class User(SqlAlchemyBase, UserMixin):
 class Post(SqlAlchemyBase):
     __tablename__ = 'post'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     image = sqlalchemy.Column(sqlalchemy.String(100))
@@ -60,7 +61,8 @@ class Post(SqlAlchemyBase):
 class Project(SqlAlchemyBase):
     __tablename__ = 'project'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     image = sqlalchemy.Column(sqlalchemy.String(100))
@@ -87,10 +89,12 @@ class Friendship(SqlAlchemyBase):
     friend_id = sqlalchemy.Column(sqlalchemy.Integer)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
+
 class Review(SqlAlchemyBase):
     __tablename__ = 'review'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True,
+                           autoincrement=True)
     description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
