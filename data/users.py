@@ -4,8 +4,6 @@ from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship, backref
-# from datetime import datetime
-from data import db_session
 
 
 class User(SqlAlchemyBase, UserMixin):
@@ -21,7 +19,9 @@ class User(SqlAlchemyBase, UserMixin):
     age = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     specialization = sqlalchemy.Column(sqlalchemy.String(100), default='')
     bio = sqlalchemy.Column(sqlalchemy.Text, default='')
-    city = sqlalchemy.Column(sqlalchemy.Text, default='')
+    city = sqlalchemy.Column(sqlalchemy.String(100), default='')
+    number = sqlalchemy.Column(sqlalchemy.String(20), default='')
+    code_word = sqlalchemy.Column(sqlalchemy.String(100), default='')
     avatar = sqlalchemy.Column(sqlalchemy.String(100), default='1.jpg')
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 

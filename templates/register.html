@@ -70,6 +70,16 @@
         {% endfor %}
       </div>
 
+      <div class="mb-3">
+        {{ form.code_word.label(class="form-label") }}
+        {{ form.code_word(class="form-control") }}
+        {% for error in form.code_word.errors %}
+          <div class="alert alert-danger mt-2" role="alert">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
       <!-- Submit -->
       <div class="d-grid mt-4">
         {{ form.submit(class="btn btn-success btn-lg") }}

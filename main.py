@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.loginform import RegisterForm, LoginForm, ProfileForm
+from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
 from data.users import User, Post, Project, Like, Friendship, Review
@@ -70,7 +70,8 @@ def register():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            surname=form.surname.data
+            surname=form.surname.data,
+            code_word=form.code_word.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -101,6 +102,24 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/fogot_password', methods=['GET', 'POST'])
+def fogot_password():
+    form = FogotForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        users = db_sess.query(User).all()
+        for user in users:
+            if user.code_word == form.code_word.data and user.email == form.email.data:
+                curr_user = db_sess.query(User).get(user.id)
+                curr_user.set_password(form.new_password.data)
+                db_sess.commit()
+                return redirect("/index")
+        return render_template('fogot_password.html',
+                               message="Неправильный логин или кодовое слово",
+                               form=form)
+    return render_template('fogot_password.html', form=form)
+
+
 @app.route('/profile_edit', methods=['GET', 'POST'])
 def profile_edit():
     db_sess = db_session.create_session()
@@ -112,6 +131,9 @@ def profile_edit():
         user.surname = form.surname.data
         user.email = form.email.data
         user.age = form.age.data
+        user.city = form.city.data
+        user.number = form.number.data
+        user.code_word = form.code_word.data
         user.specialization = form.specialization.data
         user.bio = form.bio.data
         if 'avatar' in request.files:
@@ -675,7 +697,7 @@ def delete_friend(friend_id):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new2.db")
+    db_session.global_init("db/new3.db")
     app.run()
 
 

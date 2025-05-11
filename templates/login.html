@@ -48,6 +48,10 @@
                 {{ form.submit(class="btn btn-primary btn-lg") }}
             </div>
 
+            <div class="d-grid">
+                 <a href="{{ url_for('fogot_password') }}" class="add-post-button">Забыли пароль</a>
+            </div>
+
             <!-- Optional message -->
             {% if message %}
                 <div class="alert alert-info mt-3" role="alert">
