@@ -145,7 +145,7 @@ def profile_edit():
                         if os.path.exists(old_path):
                             os.remove(old_path)
                 except:
-                    flash(f'Ошибка при сохранение файла')
+                    flash(f'Ошибка при сохранении изображения')
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = secure_filename(file.filename)
                 unique_filename = f"{timestamp}.{filename}"
@@ -153,7 +153,7 @@ def profile_edit():
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                     user.avatar = unique_filename
                 except  Exception as e:
-                    flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
+                    flash(f'Ошибка при сохранении изображения: {str(e)}')
         db_sess.commit()
         flash('Профиль успешно обновлен!', 'success')
         return redirect(url_for('profile_view'))
@@ -294,7 +294,7 @@ def edit_post(post_id):
                         try:
                             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
                         except Exception as e:
-                            app.logger.error(f"Error deleting old image: {e}")
+                            app.logger.error(f"Ошибка при удалении старого изображения: {e}")
                     ext = image.filename.split('.')[-1]
                     filename = f"post_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
                     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -305,7 +305,7 @@ def edit_post(post_id):
         except Exception as e:
             db_sess.rollback()
             flash(f'Ошибка при обновлении поста: {str(e)}', 'danger')
-            app.logger.error(f"Error editing post: {e}")
+            app.logger.error(f"Ошибка при обновлении поста: {e}")
     return render_template('edit_post.html', post=post)
 
 
@@ -326,14 +326,14 @@ def delete_post(post_id):
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
             except Exception as e:
-                app.logger.error(f"Error deleting post image: {e}")
+                app.logger.error(f"Ошибка при удалении изображения: {e}")
         db_sess.delete(post)
         db_sess.commit()
         flash('Пост успешно удален!', 'success')
     except Exception as e:
         db_sess.rollback()
         flash(f'Ошибка при удалении поста: {str(e)}', 'danger')
-        app.logger.error(f"Error deleting post: {e}")
+        app.logger.error(f"Ошибка при удалении поста: {e}")
     return redirect(url_for('posts'))
 
 
@@ -341,7 +341,8 @@ def delete_post(post_id):
 def reviews(project_id):
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
-    all_reviews = db_sess.query(Review).filter(Review.project_id == project_id).order_by(Review.project_id.desc()).all()
+    all_reviews = db_sess.query(Review).filter(
+        Review.project_id == project_id).order_by(Review.project_id.desc()).all()
     return render_template('reviews.html', reviews=all_reviews, project_id=project_id, project=project)
 
 
@@ -425,7 +426,7 @@ def delete_review(project_id, review_id):
     except Exception as e:
         db_sess.rollback()
         flash(f'Ошибка при удалении отзыва: {str(e)}', 'danger')
-        app.logger.error(f"Error deleting review: {e}")
+        app.logger.error(f"Ошибка при удалении отзыва: {e}")
     return redirect(url_for('reviews', project_id=project_id))
 
 
@@ -604,7 +605,7 @@ def edit_project(project_id):
                         try:
                             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
                         except Exception as e:
-                            app.logger.error(f"Error deleting old image: {e}")
+                            app.logger.error(f"Ошибка при удалении старого изображения: {e}")
                     ext = image.filename.split('.')[-1]
                     filename = f"project_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
                     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -615,7 +616,7 @@ def edit_project(project_id):
         except Exception as e:
             db_sess.rollback()
             flash(f'Ошибка при обновлении проекта: {str(e)}', 'danger')
-            app.logger.error(f"Error editing project: {e}")
+            app.logger.error(f"Ошибка при обновлении проекта: {e}")
     return render_template('edit_project.html', project=project)
 
 
@@ -636,14 +637,14 @@ def delete_project(project_id):
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
             except Exception as e:
-                app.logger.error(f"Error deleting project image: {e}")
+                app.logger.error(f"Ошибка при удалении изображения: {e}")
         db_sess.delete(project)
         db_sess.commit()
         flash('Проект успешно удален!', 'success')
     except Exception as e:
         db_sess.rollback()
         flash(f'Ошибка при удалении проекта: {str(e)}', 'danger')
-        app.logger.error(f"Error deleting project: {e}")
+        app.logger.error(f"Ошибка при удалении проекта: {e}")
     return redirect(url_for('projects'))
 
 
@@ -693,7 +694,7 @@ def delete_friend(friend_id):
     except Exception as e:
         db_sess.rollback()
         flash(f'Ошибка при удалении друга: {str(e)}', 'danger')
-        app.logger.error(f"Error deleting friend: {e}")
+        app.logger.error(f"Ошибка при удалении друга: {e}")
     return redirect(url_for('friends'))
 
 
@@ -710,7 +711,7 @@ def add_favorite(post_id):
     db_sess = db_session.create_session()
     try:
         new_favorite = Favorite(
-            user_id = current_user.id,
+            user_id=current_user.id,
             post_id=post_id
         )
         db_sess.add(new_favorite)
@@ -720,9 +721,6 @@ def add_favorite(post_id):
         db_sess.rollback()
         flash(f'Ошибка при сохранении в избранные: {str(e)}', 'danger')
     return redirect(url_for('home'))
-
-
-
 
 
 def main():
