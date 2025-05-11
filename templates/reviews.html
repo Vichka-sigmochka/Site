@@ -31,7 +31,7 @@
 <main class="container">
     <h1>Отзывы</h1>
 
-    {% if current_user.is_authenticated and current_user != review.author%}
+    {% if current_user.is_authenticated and current_user != project.author%}
     <a href="{{ url_for('add_review', project_id=project_id) }}" class="add-post-button">Добавить отзыв</a>
     {% endif %}
 

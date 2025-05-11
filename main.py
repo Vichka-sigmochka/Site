@@ -317,8 +317,9 @@ def delete_post(post_id):
 @app.route('/reviews/<int:project_id>', methods=['GET', 'POST'])
 def reviews(project_id):
     db_sess = db_session.create_session()
+    project = db_sess.query(Project).get(project_id)
     all_reviews = db_sess.query(Review).filter(Review.project_id == project_id).order_by(Review.project_id.desc()).all()
-    return render_template('reviews.html', reviews=all_reviews, project_id=project_id)
+    return render_template('reviews.html', reviews=all_reviews, project_id=project_id, project=project)
 
 
 @app.route('/add_review/<int:project_id>', methods=['GET', 'POST'])
