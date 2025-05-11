@@ -700,8 +700,29 @@ def delete_friend(friend_id):
 @app.route('/favorite', methods=['GET', 'POST'])
 def favorite():
     db_sess = db_session.create_session()
-    all_favorite = db_sess.query(Favorite).order_by(Review.date_created.desc()).all()
-    return render_template('reviews.html', reviews=all_favorite)
+    all_favorite = db_sess.query(Favorite).all()
+    posts = []
+    for favorite in all_favorite:
+        if favorite.user_id == current_user.id:
+            posts += [favorite.post_id]
+    favorite_data = []
+    for i in posts:
+        post = db_sess.query(Post).get(i)
+        post_data = {
+            'id': post.id,
+            'title': post.title,
+            'description': post.description,
+            'image': post.image,
+            'date_created': post.date_created,
+            'name': post.author.name if post.author else 'Неизвестный автор',
+            'user_id': post.author.id if post.author else None,
+            'likes': [like.user_id for like in post.likes],
+            'is_liked': False
+        }
+        if current_user.is_authenticated:
+            post_data['is_liked'] = current_user.id in post_data['likes']
+        favorite_data.append(post_data)
+    return render_template('favorite.html', posts=favorite_data)
 
 
 @app.route('/add_favorite/<int:post_id>', methods=['GET', 'POST'])
@@ -709,25 +730,31 @@ def favorite():
 def add_favorite(post_id):
     db_sess = db_session.create_session()
     try:
-        new_favorite = Favorite(
-            user_id = current_user.id,
-            post_id=post_id
-        )
-        db_sess.add(new_favorite)
-        db_sess.commit()
-        flash('Пост успешно добавлен в избранные!', 'success')
+        db_sess = db_session.create_session()
+        favorite = db_sess.query(Favorite).all()
+        favorites = set()
+        for i in favorite:
+            if i.user_id == current_user.id:
+                favorites.add(i.post_id)
+        if post_id in favorites:
+            flash('Этот пост уже в ваших избранных', 'danger')
+        else:
+            new_favorite = Favorite(
+                user_id = current_user.id,
+                post_id=post_id
+            )
+            db_sess.add(new_favorite)
+            db_sess.commit()
+            flash('Пост успешно добавлен в избранные!', 'success')
     except Exception as e:
         db_sess.rollback()
         flash(f'Ошибка при сохранении в избранные: {str(e)}', 'danger')
     return redirect(url_for('home'))
 
 
-
-
-
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new7.db")
+    db_session.global_init("db/new1.db")
     app.run()
 
 
