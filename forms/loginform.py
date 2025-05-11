@@ -2,7 +2,6 @@ from wtforms import PasswordField, StringField, TextAreaField, SubmitField, Emai
 from wtforms.validators import DataRequired, Email, Length, ValidationError, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import HiddenField
 
 
 class LoginForm(FlaskForm):
