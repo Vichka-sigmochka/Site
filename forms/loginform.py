@@ -20,7 +20,15 @@ class RegisterForm(FlaskForm):
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
+    code_word = StringField('Кодовое слово', validators=[DataRequired()])
     submit = SubmitField('Зарегистрироваться')
+
+
+class FogotForm(FlaskForm):
+    email = EmailField('Почта/Логин', validators=[DataRequired()])
+    code_word = StringField('Кодовое слово', validators=[DataRequired()])
+    new_password = PasswordField('Новый пароль', validators=[DataRequired()])
+    submit = SubmitField('Восстановить пароль')
 
 
 class ProfileForm(FlaskForm):
@@ -29,7 +37,9 @@ class ProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     age = IntegerField('Возраст', validators=[NumberRange(min=0)])
     specialization = StringField('Специализация', validators=[Length(max=100)])
-    town = StringField('Город', validators=[Length(max=100)])
+    city = StringField('Город', validators=[Length(max=100)])
+    number = StringField('Номер телефона', validators=[Length(max=20)])
+    code_word = StringField('Кодовое слово', validators=[DataRequired(), Length(min=1)])
     bio = TextAreaField('О себе')
     avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')

@@ -1,10 +1,10 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.loginform import RegisterForm, LoginForm, ProfileForm
+from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship, Review
+from data.users import User, Post, Project, Like, Friendship, Review, Favorite
 import datetime
 import os
 import warnings
@@ -70,7 +70,8 @@ def register():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            surname=form.surname.data
+            surname=form.surname.data,
+            code_word=form.code_word.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -101,6 +102,24 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/fogot_password', methods=['GET', 'POST'])
+def fogot_password():
+    form = FogotForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        users = db_sess.query(User).all()
+        for user in users:
+            if user.code_word == form.code_word.data and user.email == form.email.data:
+                curr_user = db_sess.query(User).get(user.id)
+                curr_user.set_password(form.new_password.data)
+                db_sess.commit()
+                return redirect("/index")
+        return render_template('fogot_password.html',
+                               message="Неправильный логин или кодовое слово",
+                               form=form)
+    return render_template('fogot_password.html', form=form)
+
+
 @app.route('/profile_edit', methods=['GET', 'POST'])
 def profile_edit():
     db_sess = db_session.create_session()
@@ -112,6 +131,9 @@ def profile_edit():
         user.surname = form.surname.data
         user.email = form.email.data
         user.age = form.age.data
+        user.city = form.city.data
+        user.number = form.number.data
+        user.code_word = form.code_word.data
         user.specialization = form.specialization.data
         user.bio = form.bio.data
         if 'avatar' in request.files:
@@ -314,6 +336,7 @@ def delete_post(post_id):
         app.logger.error(f"Error deleting post: {e}")
     return redirect(url_for('posts'))
 
+
 @app.route('/reviews/<int:project_id>', methods=['GET', 'POST'])
 def reviews(project_id):
     db_sess = db_session.create_session()
@@ -355,7 +378,7 @@ def review_detail(project_id, review_id):
     review = db_sess.query(Review).get(review_id)
     if not review:
         os.abort(404)
-    return render_template('review_detail.html',project_id=project_id, review=review)
+    return render_template('review_detail.html', project_id=project_id, review=review)
 
 
 @app.route('/edit_review/<int:project_id>/<int:review_id>', methods=['GET', 'POST'])
@@ -674,9 +697,37 @@ def delete_friend(friend_id):
     return redirect(url_for('friends'))
 
 
+@app.route('/favorite', methods=['GET', 'POST'])
+def favorite():
+    db_sess = db_session.create_session()
+    all_favorite = db_sess.query(Favorite).order_by(Review.date_created.desc()).all()
+    return render_template('reviews.html', reviews=all_favorite)
+
+
+@app.route('/add_favorite/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def add_favorite(post_id):
+    db_sess = db_session.create_session()
+    try:
+        new_favorite = Favorite(
+            user_id = current_user.id,
+            post_id=post_id
+        )
+        db_sess.add(new_favorite)
+        db_sess.commit()
+        flash('Пост успешно добавлен в избранные!', 'success')
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при сохранении в избранные: {str(e)}', 'danger')
+    return redirect(url_for('home'))
+
+
+
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new2.db")
+    db_session.global_init("db/new6.db")
     app.run()
 
 

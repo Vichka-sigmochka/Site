@@ -19,7 +19,9 @@ class User(SqlAlchemyBase, UserMixin):
     age = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     specialization = sqlalchemy.Column(sqlalchemy.String(100), default='')
     bio = sqlalchemy.Column(sqlalchemy.Text, default='')
-    city = sqlalchemy.Column(sqlalchemy.Text, default='')
+    city = sqlalchemy.Column(sqlalchemy.String(100), default='')
+    number = sqlalchemy.Column(sqlalchemy.String(20), default='')
+    code_word = sqlalchemy.Column(sqlalchemy.String(100), default='')
     avatar = sqlalchemy.Column(sqlalchemy.String(100), default='1.jpg')
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
@@ -47,6 +49,8 @@ class Post(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
 
     likes = relationship('Like', backref='post', lazy=True)
+    favorites = relationship('Favorite', backref='post', lazy=True)
+
 
     @property
     def likes_count(self):
@@ -99,3 +103,12 @@ class Review(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     project_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('project.id'), nullable=False)
+
+
+class Favorite(SqlAlchemyBase):
+    __tablename__ = 'favorite'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
+    post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'))
+    created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
