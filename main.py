@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship, Review
+from data.users import User, Post, Project, Like, Friendship, Review, Favorite
 import datetime
 import os
 import warnings
@@ -336,6 +336,7 @@ def delete_post(post_id):
         app.logger.error(f"Error deleting post: {e}")
     return redirect(url_for('posts'))
 
+
 @app.route('/reviews/<int:project_id>', methods=['GET', 'POST'])
 def reviews(project_id):
     db_sess = db_session.create_session()
@@ -376,7 +377,7 @@ def review_detail(project_id, review_id):
     review = db_sess.query(Review).get(review_id)
     if not review:
         os.abort(404)
-    return render_template('review_detail.html',project_id=project_id, review=review)
+    return render_template('review_detail.html', project_id=project_id, review=review)
 
 
 @app.route('/edit_review/<int:project_id>/<int:review_id>', methods=['GET', 'POST'])
@@ -695,9 +696,37 @@ def delete_friend(friend_id):
     return redirect(url_for('friends'))
 
 
+@app.route('/favorite', methods=['GET', 'POST'])
+def favorite():
+    db_sess = db_session.create_session()
+    all_favorite = db_sess.query(Favorite).order_by(Review.date_created.desc()).all()
+    return render_template('reviews.html', reviews=all_favorite)
+
+
+@app.route('/add_favorite/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def add_favorite(post_id):
+    db_sess = db_session.create_session()
+    try:
+        new_favorite = Favorite(
+            user_id = current_user.id,
+            post_id=post_id
+        )
+        db_sess.add(new_favorite)
+        db_sess.commit()
+        flash('Пост успешно добавлен в избранные!', 'success')
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при сохранении в избранные: {str(e)}', 'danger')
+    return redirect(url_for('home'))
+
+
+
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new3.db")
+    db_session.global_init("db/new6.db")
     app.run()
 
 

@@ -42,7 +42,6 @@ class ProfileForm(FlaskForm):
     avatar = FileField('Аватар')
     submit = SubmitField('Сохранить')
 
-
     def validate_avatar(self, field):
         if field.data:
             try:

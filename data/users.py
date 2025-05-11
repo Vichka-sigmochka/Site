@@ -48,6 +48,8 @@ class Post(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
 
     likes = relationship('Like', backref='post', lazy=True)
+    favorites = relationship('Favorite', backref='post', lazy=True)
+
 
     @property
     def likes_count(self):
@@ -89,6 +91,7 @@ class Friendship(SqlAlchemyBase):
     friend_id = sqlalchemy.Column(sqlalchemy.Integer)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
+
 class Review(SqlAlchemyBase):
     __tablename__ = 'review'
 
@@ -97,3 +100,12 @@ class Review(SqlAlchemyBase):
     date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     project_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('project.id'), nullable=False)
+
+
+class Favorite(SqlAlchemyBase):
+    __tablename__ = 'favorite'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
+    post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'))
+    created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

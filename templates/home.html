@@ -14,6 +14,7 @@
       <a class="navbar-brand" href="{{ url_for('profile_view') }}">ЛК</a>
       <a class="navbar-brand" href="{{ url_for('posts') }}">Моя жизнь</a>
       <a class="navbar-brand" href="{{ url_for('projects') }}">Мои проекты</a>
+      <a class="navbar-brand" href="{{ url_for('favorite') }}">Избранные</a>
       <a class="navbar-brand" href="{{ url_for('friends') }}">Друзья</a>
       <a class="navbar-brand" href="{{ url_for('find') }}">🔎</a>
       <div class="navbar-nav ms-auto">
@@ -64,6 +65,9 @@
                 ❤️ <span class="likes-count">{{ post.likes|length }}</span>
               </button>
             </form>
+            <div class="card-footer">
+              <a href="{{ url_for('add_favorite', post_id=post.id) }}" class="details-btn-review">Добавить в избранное</a>
+            </div>
           </div>
         </div>
         {% endfor %}
