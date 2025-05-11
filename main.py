@@ -752,6 +752,29 @@ def add_favorite(post_id):
     return redirect(url_for('home'))
 
 
+@app.route('/delete_favorite/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def delete_favorite(post_id):
+    db_sess = db_session.create_session()
+    try:
+        favorite = db_sess.query(Favorite).all()
+        favorite_delete = None
+        for i in favorite:
+            if i.user_id == current_user.id and i.post_id == post_id:
+                favorite_delete = i
+        if favorite_delete != None:
+            db_sess.delete(favorite_delete)
+            flash('Пост из избранных успешно удален!', 'success')
+        else:
+            flash('Вы не можете удалить этот пост из избранных!', 'danger')
+        db_sess.commit()
+    except Exception as e:
+        db_sess.rollback()
+        flash(f'Ошибка при удалении поста из избранных: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting friend: {e}")
+    return redirect(url_for('favorite'))
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db_session.global_init("db/new1.db")

@@ -66,6 +66,9 @@
                         </button>
                         <a href="{{ url_for('post_detail', post_id=post.id) }}" class="details-btn">Подробнее</a>
                     </form>
+                    <div class="card-footer">
+                        <a href="{{ url_for('delete_favorite', post_id=post.id) }}" class="details-btn-review">Удалить из избранных</a>
+                    </div>
                 </div>
             </div>
             {% endfor %}
