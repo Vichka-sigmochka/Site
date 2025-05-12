@@ -7,6 +7,14 @@ from sqlalchemy.orm import relationship
 
 
 class User(SqlAlchemyBase, UserMixin):
+    """
+        User: данные о пользователе
+
+        Методы
+        -------
+        set_password() :
+        check_password() :
+    """
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -39,6 +47,14 @@ class User(SqlAlchemyBase, UserMixin):
 
 
 class Post(SqlAlchemyBase):
+    """
+        Post: данные о постах пользователя
+
+        Методы
+        -------
+        likes_count() :
+        is_liked_by() :
+    """
     __tablename__ = 'post'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -63,6 +79,9 @@ class Post(SqlAlchemyBase):
 
 
 class Project(SqlAlchemyBase):
+    """
+        Project: данные о проектах пользователя
+    """
     __tablename__ = 'project'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -77,6 +96,9 @@ class Project(SqlAlchemyBase):
 
 
 class Like(SqlAlchemyBase):
+    """
+        Like: данные о лайках на посты
+    """
     __tablename__ = 'like'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -86,6 +108,9 @@ class Like(SqlAlchemyBase):
 
 
 class Friendship(SqlAlchemyBase):
+    """
+        Friendship: данные о дружеских отношениях между пользователями
+    """
     __tablename__ = 'friendship'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -95,6 +120,9 @@ class Friendship(SqlAlchemyBase):
 
 
 class Review(SqlAlchemyBase):
+    """
+        Review: данные об отзывах на проекты
+    """
     __tablename__ = 'review'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True,
@@ -106,6 +134,9 @@ class Review(SqlAlchemyBase):
 
 
 class Favorite(SqlAlchemyBase):
+    """
+        Favorite: данные о постах, которые добавлены в избранное
+    """
     __tablename__ = 'favorite'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

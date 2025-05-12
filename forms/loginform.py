@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 class LoginForm(FlaskForm):
     """
-    LoginForm : форма для авторизации
+        LoginForm : форма для авторизации
     """
     email = EmailField('Почта/Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
@@ -15,6 +15,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
+    """
+        RegisterForm : форма для регистрации
+    """
     email = EmailField('Почта/Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
@@ -25,6 +28,9 @@ class RegisterForm(FlaskForm):
 
 
 class FogotForm(FlaskForm):
+    """
+        FogotForm : форма для создания нового пароля, если пользователь забыл свой текущий пароль
+    """
     email = EmailField('Почта/Логин', validators=[DataRequired()])
     code_word = StringField('Кодовое слово', validators=[DataRequired()])
     new_password = PasswordField('Новый пароль', validators=[DataRequired()])
@@ -32,6 +38,13 @@ class FogotForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
+    """
+        ProfileForm : форма для заполнения профиля пользователя
+
+        Методы
+        -------
+        validate_avatar() : проверят формат изображения
+    """
     name = StringField('Имя', validators=[DataRequired(), Length(max=50)])
     surname = StringField('Фамилия', validators=[DataRequired(), Length(max=50)])
     email = StringField('Email', validators=[DataRequired(), Email()])
