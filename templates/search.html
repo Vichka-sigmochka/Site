@@ -4,30 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Поиск пользователей</title>
-    <link rel="stylesheet" href="static/css/search.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
 </head>
 <body>
 <div class="search-page">
-    <div class="search-container">
-        <h1 class="search-title">Найти пользователей</h1>
-        <p class="search-subtitle">Ищите по имени, фамилии, специализации или городу</p>
+    <div class="search-wrapper">
+        <div class="search-container">
+            <h1 class="search-title">Найти пользователей</h1>
+            <p class="search-subtitle">Ищите по имени, фамилии, специализации или городу</p>
 
-        <form method="GET" action="/search_results" class="search-form">
-            <div class="search-box">
-                <input type="text" name="q" class="search-input"
-                       placeholder="Начните вводить запрос..." required
-                       list="common-suggestions">
-                <button type="submit" class="search-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-            </div>
-        </form>
+            <form method="GET" action="/search" class="search-form">
+                <div class="search-box">
+                    <input type="text" name="q" id="search-input" class="search-input"
+                           placeholder="Начните вводить запрос..." required
+                           autocomplete="off">
+                    <button type="submit" class="search-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+
+                    <div class="suggestions-container" id="suggestions-container" style="display: none;">
+                        <ul class="suggestions-list" id="suggestions-list"></ul>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const suggestionsList = document.getElementById('suggestions-list');
+    const suggestionsContainer = document.getElementById('suggestions-container');
+
+    // Функция для задержки выполнения
+    function debounce(func, delay) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    // Обработчик ввода с задержкой 300мс
+    searchInput.addEventListener('input', debounce(function() {
+        const query = this.value.trim();
+
+        if (query.length < 1) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        fetch(`/search?q=${encodeURIComponent(query)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                suggestionsList.innerHTML = data.map(item =>
+                    `<li class="suggestion-item" data-value="${item}">${item}</li>`
+                ).join('');
+                suggestionsContainer.style.display = 'block';
+
+                // Подстраиваем ширину подсказок под ширину поля ввода
+                suggestionsContainer.style.width = searchInput.offsetWidth + 'px';
+            } else {
+                suggestionsContainer.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching suggestions:', error);
+            suggestionsContainer.style.display = 'none';
+        });
+    }, 300));
+
+    // Закрываем подсказки при клике вне поля
+    document.addEventListener('click', function(e) {
+        if (e.target !== searchInput &&
+            !suggestionsContainer.contains(e.target) &&
+            e.target !== document.querySelector('.search-button')) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    // Выбираем подсказку при клике
+    suggestionsList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('suggestion-item')) {
+            searchInput.value = e.target.textContent;
+            suggestionsContainer.style.display = 'none';
+            searchInput.focus();
+        }
+    });
+
+    // Обработка клавиш вверх/вниз и Enter
+    searchInput.addEventListener('keydown', function(e) {
+        const items = suggestionsList.querySelectorAll('.suggestion-item');
+        if (items.length === 0) return;
+
+        let currentIndex = Array.from(items).findIndex(item =>
+            item.classList.contains('highlighted'));
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextIndex = (currentIndex + 1) % items.length;
+            items.forEach(item => item.classList.remove('highlighted'));
+            items[nextIndex].classList.add('highlighted');
+            items[nextIndex].scrollIntoView({ block: 'nearest' });
+        }
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevIndex = (currentIndex - 1 + items.length) % items.length;
+            items.forEach(item => item.classList.remove('highlighted'));
+            items[prevIndex].classList.add('highlighted');
+            items[prevIndex].scrollIntoView({ block: 'nearest' });
+        }
+        else if (e.key === 'Enter' && currentIndex >= 0) {
+            e.preventDefault();
+            searchInput.value = items[currentIndex].textContent;
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    // Закрываем подсказки при нажатии Escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+</script>
 </body>
 </html>
