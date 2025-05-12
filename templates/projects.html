@@ -39,7 +39,7 @@
         {% for project in projects %}
         {% if current_user.is_authenticated and current_user == project.author %}
         <div class="card">
-            {% if project.image %}
+            {% if project.image%}
             <div class="card-img-container">
                 <img src="{{ url_for('static', filename='uploads/' + project.image) }}" alt="{{ project.title }}">
             </div>

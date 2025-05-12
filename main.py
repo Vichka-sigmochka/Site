@@ -321,6 +321,7 @@ def delete_post(post_id):
     try:
         post = db_sess.query(Post).get(post_id)
         user = db_sess.query(User).get(current_user.id)
+        photos = db_sess.query(Gallery).all()
         if not post:
             flash('Пост не найден', 'danger')
             return redirect(url_for('posts'))
@@ -328,6 +329,9 @@ def delete_post(post_id):
             flash('Вы не можете удалить этот пост', 'danger')
             return redirect(url_for('posts'))
         if post.image:
+            for photo in photos:
+                if photo.user == current_user and photo.image == post.image:
+                    db_sess.delete(photo)
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
             except Exception as e:
@@ -636,6 +640,7 @@ def delete_project(project_id):
     try:
         project = db_sess.query(Project).get(project_id)
         user = db_sess.query(User).get(current_user.id)
+        photos = db_sess.query(Gallery).all()
         if not project:
             flash('Проект не найден', 'danger')
             return redirect(url_for('projects'))
@@ -643,6 +648,9 @@ def delete_project(project_id):
             flash('Вы не можете удалить этот проект', 'danger')
             return redirect(url_for('projects'))
         if project.image:
+            for photo in photos:
+                if photo.user == current_user and photo.image == project.image:
+                    db_sess.delete(photo)
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
             except Exception as e:
@@ -750,7 +758,7 @@ def add_favorite(post_id):
             flash('Этот пост уже в ваших избранных', 'danger')
         else:
             new_favorite = Favorite(
-                user_id = current_user.id,
+                user_id=current_user.id,
                 post_id=post_id
             )
             db_sess.add(new_favorite)
@@ -809,7 +817,7 @@ def download(filename):
 
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new2.db")
+    db_session.global_init("db/new6.db")
     app.run()
 
 

@@ -31,7 +31,6 @@ class User(SqlAlchemyBase, UserMixin):
     reviews = relationship('Review', backref='author', lazy=True)
     gallery = relationship('Gallery', backref='user', lazy=True)
 
-
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 
@@ -52,7 +51,6 @@ class Post(SqlAlchemyBase):
 
     likes = relationship('Like', backref='post', lazy=True)
     favorites = relationship('Favorite', backref='post', lazy=True)
-
 
     @property
     def likes_count(self):
