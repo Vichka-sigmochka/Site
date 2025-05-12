@@ -29,6 +29,7 @@ class User(SqlAlchemyBase, UserMixin):
     projects = relationship('Project', backref='author', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
     reviews = relationship('Review', backref='author', lazy=True)
+    gallery = relationship('Gallery', backref='user', lazy=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -50,7 +51,6 @@ class Post(SqlAlchemyBase):
 
     likes = relationship('Like', backref='post', lazy=True)
     favorites = relationship('Favorite', backref='post', lazy=True)
-
 
     @property
     def likes_count(self):
@@ -112,3 +112,13 @@ class Favorite(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('post.id'))
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+
+
+class Gallery(SqlAlchemyBase):
+    __tablename__ = 'gallery'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
+    image = sqlalchemy.Column(sqlalchemy.String(100))
+    date_created = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))

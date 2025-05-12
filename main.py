@@ -1,10 +1,10 @@
-from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_file
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship, Review, Favorite
+from data.users import User, Post, Project, Like, Friendship, Review, Favorite, Gallery
 import datetime
 import os
 import warnings
@@ -249,6 +249,11 @@ def add_post():
                     try:
                         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         new_post.image = filename
+                        new_photo = Gallery(
+                            image=filename,
+                            user=user
+                        )
+                        db_sess.add(new_photo)
                     except Exception as e:
                         flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
             db_sess.add(new_post)
@@ -316,6 +321,7 @@ def delete_post(post_id):
     try:
         post = db_sess.query(Post).get(post_id)
         user = db_sess.query(User).get(current_user.id)
+        photos = db_sess.query(Gallery).all()
         if not post:
             flash('Пост не найден', 'danger')
             return redirect(url_for('posts'))
@@ -323,6 +329,9 @@ def delete_post(post_id):
             flash('Вы не можете удалить этот пост', 'danger')
             return redirect(url_for('posts'))
         if post.image:
+            for photo in photos:
+                if photo.user == current_user and photo.image == post.image:
+                    db_sess.delete(photo)
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
             except Exception as e:
@@ -560,6 +569,11 @@ def add_project():
                     try:
                         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         new_project.image = filename
+                        new_photo = Gallery(
+                            image=filename,
+                            user=user
+                        )
+                        db_sess.add(new_photo)
                     except Exception as e:
                         flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
             db_sess.add(new_project)
@@ -627,6 +641,7 @@ def delete_project(project_id):
     try:
         project = db_sess.query(Project).get(project_id)
         user = db_sess.query(User).get(current_user.id)
+        photos = db_sess.query(Gallery).all()
         if not project:
             flash('Проект не найден', 'danger')
             return redirect(url_for('projects'))
@@ -634,6 +649,9 @@ def delete_project(project_id):
             flash('Вы не можете удалить этот проект', 'danger')
             return redirect(url_for('projects'))
         if project.image:
+            for photo in photos:
+                if photo.user == current_user and photo.image == project.image:
+                    db_sess.delete(photo)
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
             except Exception as e:
@@ -776,9 +794,31 @@ def delete_favorite(post_id):
     return redirect(url_for('favorite'))
 
 
+@app.route('/gallery')
+def gallery():
+    db_sess = db_session.create_session()
+    all_photo = db_sess.query(Gallery).order_by(Gallery.date_created.desc()).all()
+    return render_template('gallery.html', photos=all_photo)
+
+
+@app.route('/download/<string:filename>')
+def download(filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    try:
+        flash("фотография успешно скачалась!", 'success')
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename
+        )
+    except FileNotFoundError:
+        flash("Ошибка при скачивание фотографии", 404)
+        return redirect(url_for('gallery'))
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new1.db")
+    db_session.global_init("db/new6.db")
     app.run()
 
 
