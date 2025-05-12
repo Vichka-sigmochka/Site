@@ -18,6 +18,8 @@
                     <a class="nav-link text-white" href="{{ url_for('profile_view') }}">ЛК</a>
                     <a class="nav-link text-white" href="{{ url_for('posts') }}">Моя жизнь</a>
                     <a class="nav-link text-white" href="{{ url_for('projects') }}">Мои проекты</a>
+                    <a class="nav-link text-white" href="{{ url_for('favorite') }}">Избранные</a>
+                    <a class="nav-link text-white" href="{{ url_for('gallery') }}">Галерея</a>
                     <a class="nav-link text-white" href="{{ url_for('friends') }}">Друзья</a>
                     <a class="nav-link text-white" href="{{ url_for('find') }}">🔎</a>
                     {% if current_user.is_authenticated %}
@@ -75,6 +77,11 @@
                     <div class="form-group mb-3">
                         {{ form.city.label(class="form-label") }}
                         {{ form.city(class="form-control") }}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        {{ form.number.label(class="form-label") }}
+                        {{ form.number(class="form-control") }}
                     </div>
 
                     <div class="form-group mb-3">
