@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship, Review, Favorite
+from data.users import User, Post, Project, Like, Friendship, Review, Favorite, Gallery
 import datetime
 import os
 import warnings
@@ -249,6 +249,11 @@ def add_post():
                     try:
                         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         new_post.image = filename
+                        new_photo = Gallery(
+                            image=filename,
+                            user=user
+                        )
+                        db_sess.add(new_photo)
                     except Exception as e:
                         flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
             db_sess.add(new_post)
@@ -559,6 +564,11 @@ def add_project():
                     try:
                         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         new_project.image = filename
+                        new_photo = Gallery(
+                            image=filename,
+                            user=user
+                        )
+                        db_sess.add(new_photo)
                     except Exception as e:
                         flash(f'Ошибка при сохранении изображения: {str(e)}', 'warning')
             db_sess.add(new_project)
@@ -775,9 +785,16 @@ def delete_favorite(post_id):
     return redirect(url_for('favorite'))
 
 
+@app.route('/gallery')
+def gallery():
+    db_sess = db_session.create_session()
+    all_photo = db_sess.query(Gallery).order_by(Gallery.date_created.desc()).all()
+    return render_template('gallery.html', photos=all_photo)
+
+
 def main():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new1.db")
+    db_session.global_init("db/new2.db")
     app.run()
 
 
