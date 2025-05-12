@@ -1,16 +1,17 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_file
-from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
 from werkzeug.utils import secure_filename
 from data import db_session
-from data.users import User, Post, Project, Like, Friendship, Review, Favorite, Gallery
-import datetime
-import os
-import warnings
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import func
+from data.users import User, Post, Project, Like, Friendship, Review, Favorite, Gallery
+from mainwindow import MainWindow
+import datetime
+import os
+import warnings
+
 
 warnings.simplefilter("default")
 warnings.simplefilter("ignore", category=sa_exc.LegacyAPIWarning)
@@ -307,6 +308,11 @@ def add_post():
 def post_detail(post_id):
     """
         post_detail : детали поста
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
@@ -320,6 +326,11 @@ def post_detail(post_id):
 def edit_post(post_id):
     """
         edit_post : редактирование поста
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
@@ -361,6 +372,11 @@ def edit_post(post_id):
 def delete_post(post_id):
     """
         delete_post : удаление поста
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     try:
@@ -395,6 +411,11 @@ def delete_post(post_id):
 def reviews(project_id):
     """
         reviews : отзывы
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
     """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
@@ -408,6 +429,11 @@ def reviews(project_id):
 def add_review(project_id):
     """
         add_review : добавить отзыв
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
     """
     if request.method == 'POST':
         db_sess = db_session.create_session()
@@ -437,6 +463,13 @@ def add_review(project_id):
 def review_detail(project_id, review_id):
     """
         review_detail : детали отзыва
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
+        review_id : int
+            id отзыва
     """
     db_sess = db_session.create_session()
     review = db_sess.query(Review).get(review_id)
@@ -450,6 +483,13 @@ def review_detail(project_id, review_id):
 def edit_review(project_id, review_id):
     """
         edit_review : редактирование отзыва
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
+        review_id : int
+            id отзыва
     """
     db_sess = db_session.create_session()
     review = db_sess.query(Review).get(review_id)
@@ -478,6 +518,13 @@ def edit_review(project_id, review_id):
 def delete_review(project_id, review_id):
     """
         delete_review : удаление отзыва
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
+        review_id : int
+            id отзыва
     """
     db_sess = db_session.create_session()
     try:
@@ -520,6 +567,11 @@ def friends():
 def profile_author_post(user_id):
     """
         profile_author_post : профиль автора поста/проекта
+
+        Атрибуты:
+        --------
+        user_id : int
+            id пользователя
     """
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
@@ -601,6 +653,11 @@ def projects():
 def toggle_like(post_id):
     """
         toggle_like : лайки на посты
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
@@ -675,6 +732,11 @@ def add_project():
 def project_detail(project_id):
     """
         project_detail : детали проекта
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
     """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
@@ -688,6 +750,11 @@ def project_detail(project_id):
 def edit_project(project_id):
     """
         edit_project : редактирование проекта
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
     """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
@@ -729,6 +796,11 @@ def edit_project(project_id):
 def delete_project(project_id):
     """
         delete_project : удаление проекта
+
+        Атрибуты:
+        --------
+        project_id : int
+            id проекта
     """
     db_sess = db_session.create_session()
     try:
@@ -764,6 +836,11 @@ def delete_project(project_id):
 def add_friend(friend_id):
     """
         add_friend : добавление друга
+
+        Атрибуты:
+        --------
+        friend_id : int
+            id друга
     """
     if current_user.id == friend_id:
         flash('Вы не можете добавить себя в друзья', 'danger')
@@ -794,6 +871,11 @@ def add_friend(friend_id):
 def delete_friend(friend_id):
     """
         delete_friend : удаление друга
+
+        Атрибуты:
+        --------
+        friend_id : int
+            id друга
     """
     db_sess = db_session.create_session()
     try:
@@ -851,6 +933,11 @@ def favorite():
 def add_favorite(post_id):
     """
         add_favorite : добавить в избранные пост
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     try:
@@ -881,6 +968,11 @@ def add_favorite(post_id):
 def delete_favorite(post_id):
     """
         delete_favorite : добавить в избранные пост
+
+        Атрибуты:
+        --------
+        post_id : int
+            id поста
     """
     db_sess = db_session.create_session()
     try:
@@ -916,6 +1008,11 @@ def gallery():
 def download(filename):
     """
         download : загрузка фотографии из галереи
+
+        Атрибуты:
+        --------
+        filename : str
+            имя изображения
     """
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     try:
