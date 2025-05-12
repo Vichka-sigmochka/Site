@@ -52,8 +52,8 @@ class Post(SqlAlchemyBase):
 
         Методы
         -------
-        likes_count() :
-        is_liked_by() :
+        likes_count() : количество лайков
+        is_liked_by() : нажат лайк или нет
     """
     __tablename__ = 'post'
 
@@ -146,6 +146,9 @@ class Favorite(SqlAlchemyBase):
 
 
 class Gallery(SqlAlchemyBase):
+    """
+        Gallery: галерея
+    """
     __tablename__ = 'gallery'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,

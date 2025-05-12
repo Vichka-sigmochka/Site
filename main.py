@@ -34,6 +34,9 @@ db = SQLAlchemy()
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+        load_user : загрузка пользователя
+    """
     db_sess = db_session.create_session()
     return db_sess.query(User).get(int(user_id))
 
@@ -46,6 +49,9 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    """
+        index : начальная страница
+    """
     form = MainWindow()
     if form.validate_on_submit():
         if form.submit_login.data:
@@ -56,6 +62,9 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+        register : регистрация
+    """
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -82,6 +91,9 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+        login : авторизация
+    """
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -98,12 +110,18 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    """
+        logout : выход
+    """
     logout_user()
     return redirect(url_for('index'))
 
 
 @app.route('/fogot_password', methods=['GET', 'POST'])
 def fogot_password():
+    """
+        fogot_password : создание нового пароля, если пользователь забыл старый
+    """
     form = FogotForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -122,6 +140,9 @@ def fogot_password():
 
 @app.route('/profile_edit', methods=['GET', 'POST'])
 def profile_edit():
+    """
+        profile_edit : редактирование профиля
+    """
     db_sess = db_session.create_session()
     form = ProfileForm(obj=current_user)
     user = db_sess.query(User).get(current_user.id)
@@ -162,6 +183,9 @@ def profile_edit():
 
 @app.route('/profile_view')
 def profile_view():
+    """
+        profile_view : профиль пользователя
+    """
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.id)
     return render_template('profile_view.html', user=user)
@@ -169,6 +193,9 @@ def profile_view():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    """
+        home : начальная страница с постами
+    """
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).options(
         db.joinedload(Post.author),
@@ -198,6 +225,9 @@ def home():
 
 @app.route('/home_project', methods=['GET', 'POST'])
 def home_project():
+    """
+        home_project : начальная страница с проектами
+    """
     db_sess = db_session.create_session()
     projects = db_sess.query(Project).options(
         db.joinedload(Project.author)).order_by(Project.date_created.desc()).all()
@@ -221,6 +251,9 @@ def home_project():
 
 @app.route('/posts')
 def posts():
+    """
+        posts : все посты пользователя
+    """
     db_sess = db_session.create_session()
     all_posts = db_sess.query(Post).order_by(Post.date_created.desc()).all()
     return render_template('posts.html', posts=all_posts)
@@ -229,6 +262,9 @@ def posts():
 @app.route('/add_post', methods=['GET', 'POST'])
 @login_required
 def add_post():
+    """
+        add_post : добавить пост
+    """
     if request.method == 'POST':
         db_sess = db_session.create_session()
         try:
@@ -269,6 +305,9 @@ def add_post():
 
 @app.route('/post/<int:post_id>')
 def post_detail(post_id):
+    """
+        post_detail : детали поста
+    """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
     if not post:
@@ -279,6 +318,9 @@ def post_detail(post_id):
 @app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def edit_post(post_id):
+    """
+        edit_post : редактирование поста
+    """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
     user = db_sess.query(User).get(current_user.id)
@@ -317,6 +359,9 @@ def edit_post(post_id):
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post(post_id):
+    """
+        delete_post : удаление поста
+    """
     db_sess = db_session.create_session()
     try:
         post = db_sess.query(Post).get(post_id)
@@ -348,6 +393,9 @@ def delete_post(post_id):
 
 @app.route('/reviews/<int:project_id>', methods=['GET', 'POST'])
 def reviews(project_id):
+    """
+        reviews : отзывы
+    """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
     all_reviews = db_sess.query(Review).filter(
@@ -358,6 +406,9 @@ def reviews(project_id):
 @app.route('/add_review/<int:project_id>', methods=['GET', 'POST'])
 @login_required
 def add_review(project_id):
+    """
+        add_review : добавить отзыв
+    """
     if request.method == 'POST':
         db_sess = db_session.create_session()
         try:
@@ -384,6 +435,9 @@ def add_review(project_id):
 
 @app.route('/review/<int:project_id>/<int:review_id>')
 def review_detail(project_id, review_id):
+    """
+        review_detail : детали отзыва
+    """
     db_sess = db_session.create_session()
     review = db_sess.query(Review).get(review_id)
     if not review:
@@ -394,6 +448,9 @@ def review_detail(project_id, review_id):
 @app.route('/edit_review/<int:project_id>/<int:review_id>', methods=['GET', 'POST'])
 @login_required
 def edit_review(project_id, review_id):
+    """
+        edit_review : редактирование отзыва
+    """
     db_sess = db_session.create_session()
     review = db_sess.query(Review).get(review_id)
     user = db_sess.query(User).get(current_user.id)
@@ -419,6 +476,9 @@ def edit_review(project_id, review_id):
 @app.route('/delete_review/<int:project_id>/<int:review_id>', methods=['POST'])
 @login_required
 def delete_review(project_id, review_id):
+    """
+        delete_review : удаление отзыва
+    """
     db_sess = db_session.create_session()
     try:
         review = db_sess.query(Review).get(review_id)
@@ -441,6 +501,9 @@ def delete_review(project_id, review_id):
 
 @app.route('/friends')
 def friends():
+    """
+        friends : друзья пользователя
+    """
     db_sess = db_session.create_session()
     friend = db_sess.query(Friendship).all()
     friends = []
@@ -455,6 +518,9 @@ def friends():
 @app.route('/profile_author_post/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def profile_author_post(user_id):
+    """
+        profile_author_post : профиль автора поста/проекта
+    """
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
     return render_template('profile_author.html', user=user)
@@ -462,11 +528,17 @@ def profile_author_post(user_id):
 
 @app.route('/find')
 def find():
+    """
+        find : поиск
+    """
     return render_template('search.html')
 
 
 @app.route('/search', methods=['GET'])
 def search():
+    """
+        search : поиск
+    """
     db_sess = db_session.create_session()
     query = request.args.get('q', '').lower()
     if not query:
@@ -500,6 +572,9 @@ def search():
 
 @app.route('/search_results')
 def search_results():
+    """
+        search_results : результаты поиска
+    """
     db_sess = db_session.create_session()
     query = request.args.get('q', '').lower()
     users = db_sess.query(User).filter(
@@ -513,6 +588,9 @@ def search_results():
 
 @app.route('/projects')
 def projects():
+    """
+        projects : проекты пользователя
+    """
     db_sess = db_session.create_session()
     all_projects = db_sess.query(Project).order_by(Project.date_created.desc()).all()
     return render_template('projects.html', projects=all_projects)
@@ -521,6 +599,9 @@ def projects():
 @app.route('/toggle_like/<int:post_id>', methods=['POST'])
 @login_required
 def toggle_like(post_id):
+    """
+        toggle_like : лайки на посты
+    """
     db_sess = db_session.create_session()
     post = db_sess.query(Post).get(post_id)
     if not post:
@@ -549,6 +630,9 @@ def toggle_like(post_id):
 @app.route('/add_project', methods=['GET', 'POST'])
 @login_required
 def add_project():
+    """
+        add_project : добавить проект
+    """
     if request.method == 'POST':
         db_sess = db_session.create_session()
         try:
@@ -589,6 +673,9 @@ def add_project():
 
 @app.route('/project/<int:project_id>')
 def project_detail(project_id):
+    """
+        project_detail : детали проекта
+    """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
     if not project:
@@ -599,6 +686,9 @@ def project_detail(project_id):
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
 def edit_project(project_id):
+    """
+        edit_project : редактирование проекта
+    """
     db_sess = db_session.create_session()
     project = db_sess.query(Project).get(project_id)
     user = db_sess.query(User).get(current_user.id)
@@ -637,6 +727,9 @@ def edit_project(project_id):
 @app.route('/delete_project/<int:project_id>', methods=['POST'])
 @login_required
 def delete_project(project_id):
+    """
+        delete_project : удаление проекта
+    """
     db_sess = db_session.create_session()
     try:
         project = db_sess.query(Project).get(project_id)
@@ -669,6 +762,9 @@ def delete_project(project_id):
 @app.route('/add_friend/<int:friend_id>')
 @login_required
 def add_friend(friend_id):
+    """
+        add_friend : добавление друга
+    """
     if current_user.id == friend_id:
         flash('Вы не можете добавить себя в друзья', 'danger')
     else:
@@ -696,6 +792,9 @@ def add_friend(friend_id):
 @app.route('/delete_friend/<int:friend_id>')
 @login_required
 def delete_friend(friend_id):
+    """
+        delete_friend : удаление друга
+    """
     db_sess = db_session.create_session()
     try:
         friend = db_sess.query(Friendship).all()
@@ -718,6 +817,9 @@ def delete_friend(friend_id):
 
 @app.route('/favorite', methods=['GET', 'POST'])
 def favorite():
+    """
+        favorite : избранные посты
+    """
     db_sess = db_session.create_session()
     all_favorite = db_sess.query(Favorite).all()
     posts = []
@@ -747,6 +849,9 @@ def favorite():
 @app.route('/add_favorite/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def add_favorite(post_id):
+    """
+        add_favorite : добавить в избранные пост
+    """
     db_sess = db_session.create_session()
     try:
         db_sess = db_session.create_session()
@@ -774,6 +879,9 @@ def add_favorite(post_id):
 @app.route('/delete_favorite/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def delete_favorite(post_id):
+    """
+        delete_favorite : добавить в избранные пост
+    """
     db_sess = db_session.create_session()
     try:
         favorite = db_sess.query(Favorite).all()
@@ -796,6 +904,9 @@ def delete_favorite(post_id):
 
 @app.route('/gallery')
 def gallery():
+    """
+        gallery : галерея
+    """
     db_sess = db_session.create_session()
     all_photo = db_sess.query(Gallery).order_by(Gallery.date_created.desc()).all()
     return render_template('gallery.html', photos=all_photo)
@@ -803,6 +914,9 @@ def gallery():
 
 @app.route('/download/<string:filename>')
 def download(filename):
+    """
+        download : загрузка фотографии из галереи
+    """
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     try:
         flash("фотография успешно скачалась!", 'success')
@@ -817,6 +931,9 @@ def download(filename):
 
 
 def main():
+    """
+        main : запуск сайта
+    """
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db_session.global_init("db/new6.db")
     app.run()
