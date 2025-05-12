@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_file
 from mainwindow import MainWindow
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.loginform import RegisterForm, LoginForm, ProfileForm, FogotForm
@@ -790,6 +790,21 @@ def gallery():
     db_sess = db_session.create_session()
     all_photo = db_sess.query(Gallery).order_by(Gallery.date_created.desc()).all()
     return render_template('gallery.html', photos=all_photo)
+
+
+@app.route('/download/<string:filename>')
+def download(filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    try:
+        flash("фотография успешно скачалась!", 'success')
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename
+        )
+    except FileNotFoundError:
+        flash("Ошибка при скачивание фотографии", 404)
+        return redirect(url_for('gallery'))
 
 
 def main():

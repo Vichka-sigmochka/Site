@@ -41,6 +41,9 @@
             <div class="card-img-container">
                 <img src="{{ url_for('static', filename='uploads/' + photo.image) }}">
             </div>
+            <div class="card-footer">
+                <a href="{{ url_for('download', filename=photo.image) }}" class="details-btn">Скачать</a>
+            </div>
             {% endif %}
         </div>
         {% endif %}
