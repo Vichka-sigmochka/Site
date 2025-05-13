@@ -28,7 +28,7 @@ class User(SqlAlchemyBase, UserMixin):
     specialization = sqlalchemy.Column(sqlalchemy.String(100), default='')
     bio = sqlalchemy.Column(sqlalchemy.Text, default='')
     city = sqlalchemy.Column(sqlalchemy.String(100), default='')
-    number = sqlalchemy.Column(sqlalchemy.String(20), default='')
+    number = sqlalchemy.Column(sqlalchemy.String, default='')
     code_word = sqlalchemy.Column(sqlalchemy.String(100), default='')
     avatar = sqlalchemy.Column(sqlalchemy.String(100), default='1.jpg')
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

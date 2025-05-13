@@ -33,6 +33,41 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy()
 
 
+class LengthError(Exception):
+    pass
+
+
+def number(s):
+    try:
+        if s[0] != '8' and (s[:2] != '+7') and s[0] != ' ':
+            raise LengthError('неверный формат')
+        if s.find('--') != -1 or s[-1] == '-':
+            raise LengthError('неверный формат')
+        cnt1 = s.count('(')
+        cnt2 = s.count(')')
+        if cnt1 > 1 or cnt2 > 1 or cnt1 != cnt2:
+            raise LengthError('неверный формат')
+        indx1 = s.find('(')
+        indx2 = s.find(')')
+        if indx1 > indx2:
+            raise LengthError('неверный формат')
+        ans = ""
+        for i in range(len(s)):
+            if s[i].isdigit():
+                ans += s[i]
+        if len(ans) != 11:
+            raise LengthError('неверное количество цифр')
+        if ans[0] != '8' and ans[0] != '7':
+            raise LengthError('неверный формат')
+        if ans[0] == '8':
+            res = '+7' + ans[1:]
+        else:
+            res = '+' + ans
+    except LengthError:
+        return False
+    return res
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """
@@ -148,37 +183,44 @@ def profile_edit():
     form = ProfileForm(obj=current_user)
     user = db_sess.query(User).get(current_user.id)
     if form.validate_on_submit():
-        form.populate_obj(current_user)
-        user.name = form.name.data
-        user.surname = form.surname.data
-        user.email = form.email.data
-        user.age = form.age.data
-        user.city = form.city.data
-        user.number = form.number.data
-        user.code_word = form.code_word.data
-        user.specialization = form.specialization.data
-        user.bio = form.bio.data
-        if 'avatar' in request.files:
-            file = request.files['avatar']
-            if file and file.filename != '' and allowed_file(file.filename):
-                try:
-                    if user.avatar and user.avatar != '1.jpg':
-                        old_path = os.path.join(app.config['UPLOAD_FOLDER'], user.avatar)
-                        if os.path.exists(old_path):
-                            os.remove(old_path)
-                except:
-                    flash(f'Ошибка при сохранении изображения')
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = secure_filename(file.filename)
-                unique_filename = f"{timestamp}.{filename}"
-                try:
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-                    user.avatar = unique_filename
-                except  Exception as e:
-                    flash(f'Ошибка при сохранении изображения: {str(e)}')
-        db_sess.commit()
-        flash('Профиль успешно обновлен!', 'success')
-        return redirect(url_for('profile_view'))
+        if form.number.data == '' or number(form.number.data) != False:
+            form.populate_obj(current_user)
+            user.name = form.name.data
+            user.surname = form.surname.data
+            user.email = form.email.data
+            user.age = form.age.data
+            user.city = form.city.data
+            if form.number.data == '':
+                user.number = form.number.data
+            else:
+                user.number = number(form.number.data)
+            user.code_word = form.code_word.data
+            user.specialization = form.specialization.data
+            user.bio = form.bio.data
+            if 'avatar' in request.files:
+                file = request.files['avatar']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    try:
+                        if user.avatar and user.avatar != '1.jpg':
+                            old_path = os.path.join(app.config['UPLOAD_FOLDER'], user.avatar)
+                            if os.path.exists(old_path):
+                                os.remove(old_path)
+                    except:
+                        flash(f'Ошибка при сохранении изображения')
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{timestamp}.{filename}"
+                    try:
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                        user.avatar = unique_filename
+                    except  Exception as e:
+                        flash(f'Ошибка при сохранении изображения: {str(e)}')
+            db_sess.commit()
+            flash('Профиль успешно обновлен!', 'success')
+            return redirect(url_for('profile_view'))
+        else:
+            return render_template('profile_edit.html', form=form,
+                                   message="Неверный формат номера телефона")
     return render_template('profile_edit.html', form=form)
 
 
@@ -382,21 +424,12 @@ def delete_post(post_id):
     try:
         post = db_sess.query(Post).get(post_id)
         user = db_sess.query(User).get(current_user.id)
-        photos = db_sess.query(Gallery).all()
         if not post:
             flash('Пост не найден', 'danger')
             return redirect(url_for('posts'))
         if post.author != user:
             flash('Вы не можете удалить этот пост', 'danger')
             return redirect(url_for('posts'))
-        if post.image:
-            for photo in photos:
-                if photo.user == current_user and photo.image == post.image:
-                    db_sess.delete(photo)
-            try:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
-            except Exception as e:
-                app.logger.error(f"Ошибка при удалении изображения: {e}")
         db_sess.delete(post)
         db_sess.commit()
         flash('Пост успешно удален!', 'success')
@@ -805,21 +838,12 @@ def delete_project(project_id):
     try:
         project = db_sess.query(Project).get(project_id)
         user = db_sess.query(User).get(current_user.id)
-        photos = db_sess.query(Gallery).all()
         if not project:
             flash('Проект не найден', 'danger')
             return redirect(url_for('projects'))
         if project.author != user:
             flash('Вы не можете удалить этот проект', 'danger')
             return redirect(url_for('projects'))
-        if project.image:
-            for photo in photos:
-                if photo.user == current_user and photo.image == project.image:
-                    db_sess.delete(photo)
-            try:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
-            except Exception as e:
-                app.logger.error(f"Ошибка при удалении изображения: {e}")
         db_sess.delete(project)
         db_sess.commit()
         flash('Проект успешно удален!', 'success')
@@ -1031,7 +1055,7 @@ def main():
         main : запуск сайта
     """
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new6.db")
+    db_session.global_init("db/new8.db")
     app.run()
 
 

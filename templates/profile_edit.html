@@ -41,6 +41,12 @@
                 <h1 class="text-center text-primary mb-4">Редактирование профиля</h1>
 
                 <form method="POST" action="{{ url_for('profile_edit') }}" enctype="multipart/form-data">
+                    {% if message %}
+                        <div class="alert alert-info mt-3" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
                     {{ form.hidden_tag() }}
 
                     <div class="form-group mb-3">
