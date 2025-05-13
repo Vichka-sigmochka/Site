@@ -601,8 +601,9 @@ def search():
             i = 1
             while True:
                 user = db_sess.query(User).get(i)
-                data.add((user.name, user.surname))
-                data.add((user.specialization))
+                data.add(user.name)
+                data.add(user.surname)
+                data.add(user.specialization)
                 data.add(user.city)
                 i += 1
         except:
@@ -610,8 +611,6 @@ def search():
             for s in data:
                 if type(s) == str and s.lower().startswith(query):
                     ans.append(s)
-                if type(s) == tuple and s[0].lower().startswith(query):
-                    ans.append(f'{s[0]} {s[1]}')
             return jsonify(ans[:5])
     users = db_sess.query(User).filter(
         (func.lower(User.name).startswith(query)) |
