@@ -596,14 +596,14 @@ def search():
     if not query:
         return jsonify([])
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        data = []
+        data = set()
         try:
             i = 1
             while True:
                 user = db_sess.query(User).get(i)
-                data.append((user.name, user.surname))
-                data.append((user.specialization))
-                data.append(user.city)
+                data.add((user.name, user.surname))
+                data.add((user.specialization))
+                data.add(user.city)
                 i += 1
         except:
             ans = []

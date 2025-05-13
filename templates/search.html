@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const suggestionsList = document.getElementById('suggestions-list');
     const suggestionsContainer = document.getElementById('suggestions-container');
 
-    // Функция для задержки выполнения
     function debounce(func, delay) {
         let timeout;
         return function() {
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Обработчик ввода с задержкой 300мс
     searchInput.addEventListener('input', debounce(function() {
         const query = this.value.trim();
 
@@ -74,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ).join('');
                 suggestionsContainer.style.display = 'block';
 
-                // Подстраиваем ширину подсказок под ширину поля ввода
                 suggestionsContainer.style.width = searchInput.offsetWidth + 'px';
             } else {
                 suggestionsContainer.style.display = 'none';
@@ -86,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 300));
 
-    // Закрываем подсказки при клике вне поля
     document.addEventListener('click', function(e) {
         if (e.target !== searchInput &&
             !suggestionsContainer.contains(e.target) &&
@@ -95,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Выбираем подсказку при клике
     suggestionsList.addEventListener('click', function(e) {
         if (e.target.classList.contains('suggestion-item')) {
             searchInput.value = e.target.textContent;
@@ -104,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Обработка клавиш вверх/вниз и Enter
     searchInput.addEventListener('keydown', function(e) {
         const items = suggestionsList.querySelectorAll('.suggestion-item');
         if (items.length === 0) return;
@@ -133,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Закрываем подсказки при нажатии Escape
     searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             suggestionsContainer.style.display = 'none';
