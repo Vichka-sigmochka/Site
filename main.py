@@ -348,14 +348,14 @@ def edit_post(post_id):
             if 'image' in request.files:
                 image = request.files['image']
                 if image and image.filename != '' and allowed_file(image.filename):
-                    if post.image:
-                        try:
-                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], post.image))
-                        except Exception as e:
-                            app.logger.error(f"Ошибка при удалении старого изображения: {e}")
                     ext = image.filename.split('.')[-1]
                     filename = f"post_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
                     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    new_photo = Gallery(
+                        image=filename,
+                        user=user
+                    )
+                    db_sess.add(new_photo)
                     post.image = filename
             db_sess.commit()
             flash('Пост успешно обновлен!', 'success')
@@ -771,15 +771,15 @@ def edit_project(project_id):
             if 'image' in request.files:
                 image = request.files['image']
                 if image and image.filename != '' and allowed_file(image.filename):
-                    if project.image:
-                        try:
-                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], project.image))
-                        except Exception as e:
-                            app.logger.error(f"Ошибка при удалении старого изображения: {e}")
                     ext = image.filename.split('.')[-1]
                     filename = f"project_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
                     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     project.image = filename
+                    new_photo = Gallery(
+                        image=filename,
+                        user=user
+                    )
+                    db_sess.add(new_photo)
             db_sess.commit()
             flash('Проект успешно обновлен!', 'success')
             return redirect(url_for('project_detail', project_id=project.id))
