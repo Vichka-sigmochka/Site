@@ -38,6 +38,9 @@ class LengthError(Exception):
 
 
 def number(s):
+    """
+        number : проверка на коректность номера телефона
+    """
     try:
         if s[0] != '8' and (s[:2] != '+7') and s[0] != ' ':
             raise LengthError('неверный формат')
