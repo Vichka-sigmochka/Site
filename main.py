@@ -1031,7 +1031,7 @@ def main():
         main : запуск сайта
     """
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    db_session.global_init("db/new6.db")
+    db_session.global_init("db/new7.db")
     app.run()
 
 
