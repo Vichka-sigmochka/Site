@@ -21,6 +21,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
